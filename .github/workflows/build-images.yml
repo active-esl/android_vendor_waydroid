@@ -18,6 +18,8 @@ jobs:
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
+      - name: Install checksum-pinned repo launcher
+        run: aesl/scripts/install-repo-tool.sh
       - name: Build locked Vanilla ARM64 images
         env:
           ANDROID_WORKSPACE: ${{ runner.temp }}/aesl-android-source

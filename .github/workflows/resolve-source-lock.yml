@@ -12,6 +12,8 @@ jobs:
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
+      - name: Install checksum-pinned repo launcher
+        run: aesl/scripts/install-repo-tool.sh
       - name: Resolve complete immutable manifest
         env:
           AESL_VENDOR_REVISION: ${{ github.sha }}

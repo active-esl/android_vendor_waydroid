@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate shell
-        run: bash -n aesl/scripts/common.sh aesl/scripts/resolve-lock.sh aesl/scripts/build-images.sh
+        run: bash -n aesl/scripts/*.sh
       - name: Validate Python
         run: python3 -m py_compile aesl/scripts/write-build-info.py
       - name: Check source-lock policy
