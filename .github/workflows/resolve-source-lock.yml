@@ -1,0 +1,25 @@
+name: Resolve Android source lock
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    runs-on: [self-hosted, linux, x64, aesl-android]
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - name: Resolve complete immutable manifest
+        env:
+          AESL_VENDOR_REVISION: ${{ github.sha }}
+          ANDROID_WORKSPACE: ${{ runner.temp }}/aesl-android-source
+          LOCK_OUTPUT: ${{ github.workspace }}/source-manifest.xml
+        run: aesl/scripts/resolve-lock.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lineage-20-source-lock-${{ github.sha }}
+          path: source-manifest.xml
+          if-no-files-found: error

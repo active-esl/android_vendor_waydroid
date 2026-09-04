@@ -1,0 +1,31 @@
+name: Build AESL Waydroid images
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['aesl-waydroid-v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aesl-waydroid-images
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: [self-hosted, linux, x64, aesl-android]
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build locked Vanilla ARM64 images
+        env:
+          ANDROID_WORKSPACE: ${{ runner.temp }}/aesl-android-source
+          OUTPUT_DIR: ${{ github.workspace }}/out-aesl
+        run: aesl/scripts/build-images.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aesl-waydroid-arm64-${{ github.ref_name }}
+          path: out-aesl/
+          if-no-files-found: error
+          retention-days: 30
