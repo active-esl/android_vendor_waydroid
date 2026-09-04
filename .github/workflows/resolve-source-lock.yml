@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   resolve:
-    runs-on: [self-hosted, linux, x64, aesl-android]
+    runs-on: [self-hosted, Linux, esl-proxmox]
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4

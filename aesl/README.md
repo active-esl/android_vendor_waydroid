@@ -23,10 +23,10 @@ that lock.
 
 ## Runner
 
-Image builds require a self-hosted runner labelled `aesl-android` with roughly
-300 GB of free SSD space, at least 16 GB RAM, Git LFS, Google's `repo` tool and
-the LineageOS 20 build prerequisites. The checkout and ccache directories should
-be persistent between builds.
+Image builds run on the existing self-hosted `esl-proxmox` runner. It requires
+roughly 300 GB of free SSD space, at least 16 GB RAM, Git LFS, Google's `repo`
+tool and the LineageOS 20 build prerequisites. The checkout and ccache
+directories should be persistent between builds.
 
 ## Foundries integration
 
