@@ -17,7 +17,7 @@ jobs:
       - name: Resolve complete immutable manifest
         env:
           AESL_VENDOR_REVISION: ${{ github.sha }}
-          ANDROID_WORKSPACE: ${{ runner.temp }}/aesl-android-source
+          ANDROID_WORKSPACE: /yocto/actions-runner-cache/aesl-android-source
           LOCK_OUTPUT: ${{ github.workspace }}/source-manifest.xml
         run: aesl/scripts/resolve-lock.sh
       - uses: actions/upload-artifact@v4

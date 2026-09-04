@@ -22,7 +22,7 @@ jobs:
         run: aesl/scripts/install-repo-tool.sh
       - name: Build locked Vanilla ARM64 images
         env:
-          ANDROID_WORKSPACE: ${{ runner.temp }}/aesl-android-source
+          ANDROID_WORKSPACE: /yocto/actions-runner-cache/aesl-android-source
           OUTPUT_DIR: ${{ github.workspace }}/out-aesl
         run: aesl/scripts/build-images.sh
       - uses: actions/upload-artifact@v4
