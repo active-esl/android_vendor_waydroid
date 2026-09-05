@@ -7,10 +7,10 @@ set -euo pipefail
 
 readonly REPOSITORY="${AESL_GITHUB_REPOSITORY:-active-esl/android_vendor_waydroid}"
 readonly RUN_ID="${1:?usage: $0 RUN_ID [INTERVAL_SECONDS]}"
-readonly INTERVAL_SECONDS="${2:-60}"
+readonly INTERVAL_SECONDS="${2:-300}"
 
-if ! [[ "$INTERVAL_SECONDS" =~ ^[0-9]+$ ]] || (( INTERVAL_SECONDS < 60 )); then
-    echo "error: interval must be an integer of at least 60 seconds" >&2
+if ! [[ "$INTERVAL_SECONDS" =~ ^[0-9]+$ ]] || (( INTERVAL_SECONDS < 300 )); then
+    echo "error: interval must be an integer of at least 300 seconds" >&2
     exit 2
 fi
 
