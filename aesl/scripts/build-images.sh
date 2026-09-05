@@ -11,6 +11,7 @@ export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(git -C "${repo_root}" show -s -
 require_command repo
 require_command git
 require_command sha256sum
+require_command python3
 
 lock_file="${SOURCE_LOCK:-${repo_root}/aesl/manifests/lineage-20-lock.xml}"
 [[ -s "${lock_file}" ]] || die "reviewed source lock missing: ${lock_file}"
@@ -18,6 +19,16 @@ lock_file="${SOURCE_LOCK:-${repo_root}/aesl/manifests/lineage-20-lock.xml}"
 android_dir="${ANDROID_WORKSPACE:-${repo_root}/.android-workspace}"
 output_dir="${OUTPUT_DIR:-${repo_root}/out-aesl}"
 mkdir -p "${android_dir}" "${output_dir}"
+
+# LineageOS 20 still invokes `python` in a few host tools. The runner provides
+# Python 3 as `python3`; provide a workspace-local compatibility name without
+# changing the runner's system Python configuration.
+if ! command -v python >/dev/null 2>&1; then
+    python_shim_dir="${android_dir}/.aesl-bin"
+    mkdir -p "${python_shim_dir}"
+    ln -sf "$(command -v python3)" "${python_shim_dir}/python"
+    export PATH="${python_shim_dir}:${PATH}"
+fi
 cd "${android_dir}"
 
 # The reviewed lock is already a complete flattened manifest. Loading it as a
