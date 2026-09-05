@@ -27,3 +27,7 @@ authoritative.
   `583e5aa`; artifact `lineage-20-source-lock-583e5aa47fca4509ba0e878d5d35e1a6d2120c5c`
   contains 1,254 projects, each pinned to a 40-hex commit revision. Manifest
   SHA-256: `2de1771c3efc77e3c292b6d06ac26813eda986d601ffab18f1e8adf73e578abb`.
+- Image-build run `33957198264` exposed that copying the flattened lock into
+  the upstream manifest checkout causes `repo init` to reapply obsolete
+  remove-project directives. Builds now load the reviewed XML through repo's
+  standalone-manifest mode and sync only its pinned project revisions.
