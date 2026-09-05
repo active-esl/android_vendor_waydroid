@@ -67,8 +67,13 @@ GIT_CONFIG_VALUE_0=HTTP/1.1 \
 # after each force-checkout.  The locked LineageOS framework remains untouched.
 gatekeeper_compat_patch="${repo_root}/aesl/patches/0001-waydroid-gatekeeper-android13-sizedbuffer.patch"
 [[ -s "${gatekeeper_compat_patch}" ]] || die "Waydroid gatekeeper compatibility patch missing"
-git -C hardware/waydroid apply --check "${gatekeeper_compat_patch}"
-git -C hardware/waydroid apply "${gatekeeper_compat_patch}"
+if git -C hardware/waydroid apply --check "${gatekeeper_compat_patch}"; then
+    git -C hardware/waydroid apply "${gatekeeper_compat_patch}"
+elif git -C hardware/waydroid apply --reverse --check "${gatekeeper_compat_patch}"; then
+    echo "Waydroid gatekeeper compatibility patch already applied"
+else
+    die "Waydroid gatekeeper source does not match the reviewed compatibility patch"
+fi
 
 # Android's generated environment and its lunch/m helpers read optional shell
 # variables without defaults. Keep nounset disabled for their complete lifecycle.
