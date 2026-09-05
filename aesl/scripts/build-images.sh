@@ -31,17 +31,25 @@ if ! command -v python >/dev/null 2>&1; then
 fi
 cd "${android_dir}"
 
-# The reviewed lock is already a complete flattened manifest. Loading it as a
-# standalone manifest avoids reapplying include/remove directives from the
-# mutable upstream manifest checkout.
+# The reviewed lock is already a complete flattened manifest. Present it to
+# repo through a local Git checkout: standalone XML mode leaves .repo/manifests
+# without Git metadata, causing repo to emit recovery errors on every run.
+manifest_dir="${android_dir}/.aesl-manifest"
+rm -rf "${manifest_dir}"
+git init --quiet "${manifest_dir}"
+git -C "${manifest_dir}" config user.name "AESL CI"
+git -C "${manifest_dir}" config user.email "ci@active-esl.local"
+install -m 0644 "${lock_file}" "${manifest_dir}/default.xml"
+git -C "${manifest_dir}" add default.xml
+git -C "${manifest_dir}" commit --quiet -m "AESL reviewed source lock"
+
 if [[ -d .repo ]]; then
-    # repo cannot convert a damaged or non-standalone manifest checkout in
-    # place. Reset only manifest metadata; retain project-objects and checked
-    # out sources in the persistent workspace.
+    # Reset only manifest metadata; retain project objects and checked-out
+    # sources in the persistent workspace.
     rm -rf .repo/local_manifests .repo/manifests .repo/manifests.git
     rm -f .repo/manifest.xml
 fi
-repo init -u "file://${lock_file}" --standalone-manifest --git-lfs
+repo init -u "file://${manifest_dir}" -m default.xml --git-lfs
 GIT_CONFIG_COUNT=1 \
     GIT_CONFIG_KEY_0=http.version \
     GIT_CONFIG_VALUE_0=HTTP/1.1 \
