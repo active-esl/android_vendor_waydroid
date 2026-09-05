@@ -23,6 +23,13 @@ cd "${android_dir}"
 # The reviewed lock is already a complete flattened manifest. Loading it as a
 # standalone manifest avoids reapplying include/remove directives from the
 # mutable upstream manifest checkout.
+if [[ -d .repo ]]; then
+    # repo cannot convert a damaged or non-standalone manifest checkout in
+    # place. Reset only manifest metadata; retain project-objects and checked
+    # out sources in the persistent workspace.
+    rm -rf .repo/manifests .repo/manifests.git
+    rm -f .repo/manifest.xml
+fi
 repo init -u "file://${lock_file}" --standalone-manifest --git-lfs
 GIT_CONFIG_COUNT=1 \
     GIT_CONFIG_KEY_0=http.version \

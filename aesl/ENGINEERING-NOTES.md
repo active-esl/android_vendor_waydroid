@@ -31,3 +31,7 @@ authoritative.
   the upstream manifest checkout causes `repo init` to reapply obsolete
   remove-project directives. Builds now load the reviewed XML through repo's
   standalone-manifest mode and sync only its pinned project revisions.
+- Image-build run `33957326778` then showed that repo cannot convert the
+  damaged cached manifest checkout in place. The build resets only `.repo`
+  manifest metadata before standalone init, preserving project objects and
+  source checkouts.
