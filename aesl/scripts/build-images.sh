@@ -13,6 +13,8 @@ require_command git
 require_command sha256sum
 require_command python3
 require_command zip
+require_command meson
+require_command ninja
 
 # Android 13's pinned host Clang is linked against the legacy ncurses ABI.
 # Check it before source sync/build rather than failing deep in Ninja.
