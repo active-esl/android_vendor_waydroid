@@ -144,6 +144,15 @@ apply_checked_patch \
     "${repo_root}/aesl/patches/0001-waydroid-gatekeeper-android13-sizedbuffer.patch" \
     "Waydroid gatekeeper compatibility"
 
+# The Waydroid vendor init services use its dynamic `host` UID. Android 13's
+# init verifier shares DecodeUid with init itself, so this minimal upstream
+# system/core patch is required for both a valid image and verification of its
+# vendor init script. Keep the rest of Waydroid's framework/core stack opt-in.
+apply_checked_patch \
+    system/core \
+    "${repo_root}/waydroid-patches/base-patches-33/system/core/0005-init-Define-host-user.patch" \
+    "Waydroid init host UID"
+
 # Android's generated environment and its lunch/m helpers read optional shell
 # variables without defaults. Keep nounset disabled for their complete lifecycle.
 # shellcheck disable=SC1091
