@@ -6,7 +6,7 @@
   <remote name="gitlab" fetch="https://gitlab.com/"/>
   <remote name="private" fetch="ssh://git@github.com"/>
   
-  <default remote="github" revision="refs/heads/lineage-20.0" sync-j="4" sync-c="true"/>
+  <default remote="github" sync-j="4" sync-c="true"/>
   
   <project name="LineageOS/android" path="android" revision="0f523488ee3fe9d2ad553780692cb5a55b9d03e1" upstream="refs/heads/lineage-20.0" dest-branch="refs/heads/lineage-20.0"/>
   <project name="LineageOS/android_bionic" path="bionic" revision="e0aac7df6f58138dae903b5d456c947a3f8092ea" upstream="refs/heads/lineage-20.0" dest-branch="refs/heads/lineage-20.0" groups="pdk"/>

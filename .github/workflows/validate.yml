@@ -19,7 +19,21 @@ jobs:
         run: python3 -m py_compile aesl/scripts/write-build-info.py
       - name: Check source-lock policy
         run: |
-          if grep -R 'refs/heads/' aesl/manifests --include='*-lock.xml'; then
-            echo 'Source locks must contain immutable revisions' >&2
-            exit 1
-          fi
+          python3 - <<'PY'
+          import sys
+          from pathlib import Path
+          from xml.etree import ElementTree
+
+          failures = []
+          for lock_file in Path("aesl/manifests").glob("*-lock.xml"):
+              root = ElementTree.parse(lock_file).getroot()
+              for element in root.iter():
+                  value = element.get("revision")
+                  if value is not None and value.startswith("refs/heads/"):
+                      failures.append(f"{lock_file}: <{element.tag}> revision={value!r}")
+
+          if failures:
+              print("Source-lock revision attributes must not reference mutable branches:", *failures,
+                    sep="\n", file=sys.stderr)
+              sys.exit(1)
+          PY
