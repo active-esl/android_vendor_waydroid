@@ -23,3 +23,7 @@ authoritative.
   some project worktrees partially checked out. The dedicated CT101 `/yocto`
   dataset was expanded to 800 GB, and source sync now forces checkout repair
   while continuing to reuse downloaded Git objects.
+- Proof: source-lock run `33956272488` completed successfully from commit
+  `583e5aa`; artifact `lineage-20-source-lock-583e5aa47fca4509ba0e878d5d35e1a6d2120c5c`
+  contains 1,254 projects, each pinned to a 40-hex commit revision. Manifest
+  SHA-256: `2de1771c3efc77e3c292b6d06ac26813eda986d601ffab18f1e8adf73e578abb`.
