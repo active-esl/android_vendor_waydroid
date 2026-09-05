@@ -32,6 +32,20 @@ then
     die "Meson >= 1.4 is required by the locked Mesa source"
 fi
 
+if ! python3 - "$(glslangValidator --version)" <<'PY'
+import re
+import sys
+
+match = re.search(r"Glslang Version:\s*\d+:(\d+)\.(\d+)", sys.argv[1])
+if match is None:
+    raise SystemExit(1)
+version = tuple(int(part) for part in match.groups())
+raise SystemExit(0 if version >= (12, 2) else 1)
+PY
+then
+    die "glslangValidator >= 12.2 is required by the locked Mesa source"
+fi
+
 # Android 13's pinned host Clang is linked against the legacy ncurses ABI.
 # Check it before source sync/build rather than failing deep in Ninja.
 if ! ldconfig -p 2>/dev/null | grep -q 'libncurses\.so\.5'; then
