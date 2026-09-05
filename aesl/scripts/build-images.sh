@@ -144,9 +144,9 @@ apply_checked_patch \
     "${repo_root}/aesl/patches/0001-waydroid-gatekeeper-android13-sizedbuffer.patch" \
     "Waydroid gatekeeper compatibility"
 apply_checked_patch \
-    hardware/waydroid \
-    "${repo_root}/aesl/patches/0002-waydroid-hwcomposer-fractional-scale-protocol.patch" \
-    "Waydroid hwcomposer fractional-scale protocol"
+    external/wayland-protocols \
+    "${repo_root}/waydroid-patches/base-patches-33/external/wayland-protocols/0001-staging-Add-fractional-scale.patch" \
+    "Waydroid fractional-scale protocol"
 
 # The Waydroid vendor init services use its dynamic `host` UID. Android 13's
 # init verifier shares DecodeUid with init itself, so this minimal upstream
@@ -156,6 +156,10 @@ apply_checked_patch \
     system/core \
     "${repo_root}/waydroid-patches/base-patches-33/system/core/0005-init-Define-host-user.patch" \
     "Waydroid init host UID"
+apply_checked_patch \
+    system/core \
+    "${repo_root}/waydroid-patches/base-patches-33/system/core/0004-libsync-Add-sw_sync-symbols-to-map.patch" \
+    "Waydroid libsync ABI"
 
 # Android's generated environment and its lunch/m helpers read optional shell
 # variables without defaults. Keep nounset disabled for their complete lifecycle.
