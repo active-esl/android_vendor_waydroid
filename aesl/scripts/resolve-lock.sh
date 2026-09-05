@@ -12,9 +12,19 @@ require_command git
 repo_sync_with_retries() {
     local attempt
     local max_attempts=4
+    local sync_jobs="${JOBS:-8}"
 
     for attempt in $(seq 1 "${max_attempts}"); do
-        if repo sync -c --no-tags --fail-fast -j"${JOBS:-8}" "$@"; then
+        echo "repo sync attempt ${attempt}/${max_attempts} with ${sync_jobs} network jobs"
+
+        # Android source sync fans out into hundreds of Git fetches.  Force the
+        # child Git processes to HTTP/1.1 because long-lived HTTP/2 streams have
+        # repeatedly been reset by the source hosts on CT101.  Keep this config
+        # scoped to the sync process rather than changing the runner account.
+        if GIT_CONFIG_COUNT=1 \
+            GIT_CONFIG_KEY_0=http.version \
+            GIT_CONFIG_VALUE_0=HTTP/1.1 \
+            repo sync -c --no-tags --fail-fast -j"${sync_jobs}" "$@"; then
             return 0
         fi
 
@@ -23,7 +33,11 @@ repo_sync_with_retries() {
             return 1
         fi
 
-        echo "repo sync attempt ${attempt}/${max_attempts} failed; retaining downloaded objects and retrying" >&2
+        if [ "${sync_jobs}" -gt 1 ]; then
+            sync_jobs=$((sync_jobs / 2))
+        fi
+
+        echo "repo sync attempt ${attempt}/${max_attempts} failed; retaining downloaded objects and retrying with ${sync_jobs} network jobs" >&2
         sleep $((attempt * 15))
     done
 }
