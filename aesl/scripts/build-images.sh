@@ -16,6 +16,21 @@ require_command zip
 require_command meson
 require_command ninja
 
+# The locked Mesa source requires Meson >= 1.4.  Debian 12's stock package is
+# older, so reject it before the hour-long Android build reaches Mesa.
+if ! python3 - "$(meson --version)" <<'PY'
+import sys
+
+try:
+    version = tuple(int(part) for part in sys.argv[1].split(".")[:2])
+except ValueError:
+    raise SystemExit(1)
+raise SystemExit(0 if version >= (1, 4) else 1)
+PY
+then
+    die "Meson >= 1.4 is required by the locked Mesa source"
+fi
+
 # Android 13's pinned host Clang is linked against the legacy ncurses ABI.
 # Check it before source sync/build rather than failing deep in Ninja.
 if ! ldconfig -p 2>/dev/null | grep -q 'libncurses\.so\.5'; then
