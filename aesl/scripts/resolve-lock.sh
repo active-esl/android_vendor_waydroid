@@ -24,7 +24,8 @@ repo_sync_with_retries() {
         if GIT_CONFIG_COUNT=1 \
             GIT_CONFIG_KEY_0=http.version \
             GIT_CONFIG_VALUE_0=HTTP/1.1 \
-            repo sync -c --no-tags --fail-fast -j"${sync_jobs}" "$@"; then
+            repo sync -c --no-tags --fail-fast --force-checkout \
+                -j"${sync_jobs}" "$@"; then
             return 0
         fi
 

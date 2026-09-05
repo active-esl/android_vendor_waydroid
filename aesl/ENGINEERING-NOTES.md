@@ -19,3 +19,7 @@ authoritative.
   but failed after transient TLS disconnects from the Android source host.
 - Pipeline decision: retry source sync in place so already downloaded Git
   objects are preserved; do not weaken immutable source locking.
+- Pipeline follow-up: the retained checkout filled its 400 GB dataset and left
+  some project worktrees partially checked out. The dedicated CT101 `/yocto`
+  dataset was expanded to 800 GB, and source sync now forces checkout repair
+  while continuing to reuse downloaded Git objects.
