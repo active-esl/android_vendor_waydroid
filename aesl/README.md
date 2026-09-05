@@ -13,6 +13,12 @@ The pipeline produces:
 Google applications are deliberately excluded. Signing and release publication
 are separate protected stages; development images are not production releases.
 
+The normal image workflow does not apply Waydroid's framework/core patch stack:
+it produces the locked vanilla LineageOS system image paired with the Waydroid
+vendor image.  Set `AESL_APPLY_WAYDROID_PATCHES=true` only in a dedicated
+runtime-integration lane after that patch stack has been rebased and tested
+against the locked source manifest.
+
 ## Source locking
 
 Android is a multi-repository build. A branch name alone is not reproducible.

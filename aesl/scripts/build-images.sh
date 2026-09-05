@@ -41,7 +41,14 @@ GIT_CONFIG_COUNT=1 \
 set +u
 source build/envsetup.sh
 set -u
-apply-waydroid-patches
+
+# This CI lane proves the reproducible vanilla LineageOS system image and the
+# paired Waydroid vendor image.  The upstream patch stack changes framework and
+# core Android sources; it is intentionally opt-in until it has been rebased
+# and runtime-tested against this exact source lock.
+if [[ "${AESL_APPLY_WAYDROID_PATCHES:-false}" == "true" ]]; then
+    apply-waydroid-patches
+fi
 export TARGET_USE_MESA=true
 lunch "${AESL_LUNCH_TARGET}"
 m -j"${JOBS:-8}" systemimage vendorimage
