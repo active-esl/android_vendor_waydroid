@@ -16,6 +16,14 @@ require_command zip
 require_command meson
 require_command ninja
 require_command glslangValidator
+require_command bison
+require_command flex
+
+# Mesa's generated sources use these modules through the runner's host Python.
+# Check them up front instead of discovering missing modules during Meson setup.
+if ! python3 -c 'import mako, pycparser' >/dev/null 2>&1; then
+    die 'Python Mako and pycparser modules are required by locked Mesa (install python3-mako python3-pycparser)'
+fi
 
 # The locked Mesa source requires Meson >= 1.4.  Debian 12's stock package is
 # older, so reject it before the hour-long Android build reaches Mesa.
@@ -94,18 +102,47 @@ GIT_CONFIG_COUNT=1 \
 GIT_CONFIG_VALUE_0=HTTP/1.1 \
     repo sync -c --no-tags --force-checkout -j"${JOBS:-8}"
 
-# Waydroid's legacy gatekeeper HAL is vendor hardware code.  Android 13 keeps
+apply_checked_patch() {
+    local project_dir="$1"
+    local patch_file="$2"
+    local description="$3"
+
+    [[ -s "${patch_file}" ]] || die "${description} patch missing: ${patch_file}"
+    if git -C "${project_dir}" apply --check "${patch_file}"; then
+        git -C "${project_dir}" apply "${patch_file}"
+    elif git -C "${project_dir}" apply --reverse --check "${patch_file}"; then
+        echo "${description} patch already applied"
+    else
+        die "${description} source does not match the reviewed patch"
+    fi
+}
+
+# Mesa 26 is built with Waydroid's pinned host helpers.  This upstream,
+# build-tools-only patch exposes the already locked prebuilts/mesa-tools
+# binaries to the Android build PATH.  It does not alter the vanilla Android
+# framework/core source lane.
+apply_checked_patch \
+    prebuilts/build-tools \
+    "${repo_root}/waydroid-patches/base-patches-33/prebuilts/build-tools/0001-Add-prebuilt-mesa-tools-to-PATH.patch" \
+    "Waydroid Mesa build-tools"
+
+mesa_tools_path="${android_dir}/prebuilts/build-tools/path/linux-x86"
+for mesa_tool in mesa_clc vtn_bindgen2 asahi_clc panfrost_compile; do
+    [[ -x "${mesa_tools_path}/${mesa_tool}" ]] || \
+        die "locked Waydroid Mesa helper missing or not executable: ${mesa_tool}"
+done
+# Make the build-tool path explicit.  The patched symlinks are provided by the
+# locked source tree; exporting this here also makes nested Meson invocations
+# deterministic instead of relying on an ambient runner PATH.
+export PATH="${mesa_tools_path}:${PATH}"
+
+# Waydroid's legacy gatekeeper HAL is vendor hardware code. Android 13 keeps
 # SizedBuffer ownership private, so apply the reviewed HAL-only adaptation
-# after each force-checkout.  The locked LineageOS framework remains untouched.
-gatekeeper_compat_patch="${repo_root}/aesl/patches/0001-waydroid-gatekeeper-android13-sizedbuffer.patch"
-[[ -s "${gatekeeper_compat_patch}" ]] || die "Waydroid gatekeeper compatibility patch missing"
-if git -C hardware/waydroid apply --check "${gatekeeper_compat_patch}"; then
-    git -C hardware/waydroid apply "${gatekeeper_compat_patch}"
-elif git -C hardware/waydroid apply --reverse --check "${gatekeeper_compat_patch}"; then
-    echo "Waydroid gatekeeper compatibility patch already applied"
-else
-    die "Waydroid gatekeeper source does not match the reviewed compatibility patch"
-fi
+# after each force-checkout. The locked LineageOS framework remains untouched.
+apply_checked_patch \
+    hardware/waydroid \
+    "${repo_root}/aesl/patches/0001-waydroid-gatekeeper-android13-sizedbuffer.patch" \
+    "Waydroid gatekeeper compatibility"
 
 # Android's generated environment and its lunch/m helpers read optional shell
 # variables without defaults. Keep nounset disabled for their complete lifecycle.
