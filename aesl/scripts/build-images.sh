@@ -15,6 +15,7 @@ require_command python3
 require_command zip
 require_command meson
 require_command ninja
+require_command glslangValidator
 
 # The locked Mesa source requires Meson >= 1.4.  Debian 12's stock package is
 # older, so reject it before the hour-long Android build reaches Mesa.
