@@ -27,7 +27,7 @@ if [[ -d .repo ]]; then
     # repo cannot convert a damaged or non-standalone manifest checkout in
     # place. Reset only manifest metadata; retain project-objects and checked
     # out sources in the persistent workspace.
-    rm -rf .repo/manifests .repo/manifests.git
+    rm -rf .repo/local_manifests .repo/manifests .repo/manifests.git
     rm -f .repo/manifest.xml
 fi
 repo init -u "file://${lock_file}" --standalone-manifest --git-lfs

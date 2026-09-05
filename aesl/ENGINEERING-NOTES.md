@@ -35,3 +35,6 @@ authoritative.
   damaged cached manifest checkout in place. The build resets only `.repo`
   manifest metadata before standalone init, preserving project objects and
   source checkouts.
+- Image-build run `33957389348` confirmed standalone init itself succeeded;
+  stale `.repo/local_manifests` then reapplied the already-flattened Waydroid
+  overlay. The manifest reset now removes that overlay directory as well.
