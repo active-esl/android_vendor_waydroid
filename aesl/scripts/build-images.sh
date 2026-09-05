@@ -143,6 +143,10 @@ apply_checked_patch \
     hardware/waydroid \
     "${repo_root}/aesl/patches/0001-waydroid-gatekeeper-android13-sizedbuffer.patch" \
     "Waydroid gatekeeper compatibility"
+apply_checked_patch \
+    hardware/waydroid \
+    "${repo_root}/aesl/patches/0002-waydroid-hwcomposer-fractional-scale-protocol.patch" \
+    "Waydroid hwcomposer fractional-scale protocol"
 
 # The Waydroid vendor init services use its dynamic `host` UID. Android 13's
 # init verifier shares DecodeUid with init itself, so this minimal upstream
