@@ -1,0 +1,70 @@
+From 0f0fc0a0f9554e715e47a3bf5fe0d723df917dca Mon Sep 17 00:00:00 2001
+From: Active ESL CI <ci@active-esl.local>
+Date: Fri, 5 Sep 2026 13:41:36 +0000
+Subject: [PATCH] gatekeeper: use the Android 13 SizedBuffer API
+
+Android 13 keeps SizedBuffer storage private. The Waydroid HAL is vendor
+hardware code, so adapt it to the public size()/Data() API and copy returned
+buffers into the ownership expected by the legacy HAL interface. Do not alter
+the locked LineageOS framework or gatekeeper source.
+---
+ gatekeeper/SoftGateKeeper.h         |  6 +++---
+ gatekeeper/SoftGateKeeperDevice.cpp | 22 ++++++++++++++++------
+ 2 files changed, 19 insertions(+), 9 deletions(-)
+
+diff --git a/gatekeeper/SoftGateKeeper.h b/gatekeeper/SoftGateKeeper.h
+index 6ae91f3..e3d3fd4 100644
+--- a/gatekeeper/SoftGateKeeper.h
++++ b/gatekeeper/SoftGateKeeper.h
+@@ -135,9 +135,9 @@ public:
+ 
+     fast_hash_t ComputeFastHash(const SizedBuffer &password, uint64_t salt) {
+         fast_hash_t fast_hash;
+-        size_t digest_size = password.length + sizeof(salt);
++        size_t digest_size = password.size() + sizeof(salt);
+         std::unique_ptr<uint8_t[]> digest(new uint8_t[digest_size]);
+         memcpy(digest.get(), &salt, sizeof(salt));
+-        memcpy(digest.get() + sizeof(salt), password.buffer.get(), password.length);
++        memcpy(digest.get() + sizeof(salt), password.Data<uint8_t>(), password.size());
+ 
+         SHA256(digest.get(), digest_size, (uint8_t *) &fast_hash.digest);
+diff --git a/gatekeeper/SoftGateKeeperDevice.cpp b/gatekeeper/SoftGateKeeperDevice.cpp
+index 694acc4..6d30fa5 100644
+--- a/gatekeeper/SoftGateKeeperDevice.cpp
++++ b/gatekeeper/SoftGateKeeperDevice.cpp
+@@ -69,12 +69,18 @@ int SoftGateKeeperDevice::enroll(uint32_t uid,
+         return -EINVAL;
+     }
+ 
+-    *enrolled_password_handle = response.enrolled_password_handle.buffer.release();
++    *enrolled_password_handle_length = response.enrolled_password_handle.size();
++    if (*enrolled_password_handle_length == 0) {
++        return -EINVAL;
++    }
++    *enrolled_password_handle = new uint8_t[*enrolled_password_handle_length];
++    memcpy(*enrolled_password_handle,
++           response.enrolled_password_handle.Data<uint8_t>(),
++           *enrolled_password_handle_length);
+     gatekeeper::password_handle_t *handle =
+                     reinterpret_cast<gatekeeper::password_handle_t *>(*enrolled_password_handle);
+     //FIXIT: We need to move this module to host with gatekeeper pipe
+     handle->hardware_backed = true;
+ 
+-    *enrolled_password_handle_length = response.enrolled_password_handle.length;
+     return 0;
+ }
+@@ -113,6 +119,12 @@ int SoftGateKeeperDevice::verify(uint32_t uid,
+     }
+ 
+     if (auth_token != NULL && auth_token_length != NULL) {
+-       *auth_token = response.auth_token.buffer.release();
+-       *auth_token_length = response.auth_token.length;
++        *auth_token_length = response.auth_token.size();
++        if (*auth_token_length == 0) {
++            return -EINVAL;
++        }
++        *auth_token = new uint8_t[*auth_token_length];
++        memcpy(*auth_token,
++               response.auth_token.Data<uint8_t>(),
++               *auth_token_length);
+     }

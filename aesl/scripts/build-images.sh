@@ -59,8 +59,16 @@ fi
 repo init -u "file://${manifest_dir}" -m default.xml --git-lfs
 GIT_CONFIG_COUNT=1 \
     GIT_CONFIG_KEY_0=http.version \
-    GIT_CONFIG_VALUE_0=HTTP/1.1 \
+GIT_CONFIG_VALUE_0=HTTP/1.1 \
     repo sync -c --no-tags --force-checkout -j"${JOBS:-8}"
+
+# Waydroid's legacy gatekeeper HAL is vendor hardware code.  Android 13 keeps
+# SizedBuffer ownership private, so apply the reviewed HAL-only adaptation
+# after each force-checkout.  The locked LineageOS framework remains untouched.
+gatekeeper_compat_patch="${repo_root}/aesl/patches/0001-waydroid-gatekeeper-android13-sizedbuffer.patch"
+[[ -s "${gatekeeper_compat_patch}" ]] || die "Waydroid gatekeeper compatibility patch missing"
+git -C hardware/waydroid apply --check "${gatekeeper_compat_patch}"
+git -C hardware/waydroid apply "${gatekeeper_compat_patch}"
 
 # Android's generated environment and its lunch/m helpers read optional shell
 # variables without defaults. Keep nounset disabled for their complete lifecycle.
