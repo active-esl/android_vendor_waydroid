@@ -100,7 +100,29 @@ repo init -u "file://${manifest_dir}" -m default.xml --git-lfs
 GIT_CONFIG_COUNT=1 \
     GIT_CONFIG_KEY_0=http.version \
 GIT_CONFIG_VALUE_0=HTTP/1.1 \
-    repo sync -c --no-tags --force-checkout -j"${JOBS:-8}"
+repo sync -c --no-tags --force-checkout -j"${JOBS:-8}"
+
+prepare_patched_project() {
+    local project_dir="$1"
+
+    # repo sync retains local edits when it is already at the locked revision.
+    # The compatibility patches below are deliberately build-local, ordered
+    # working-tree edits; restore only their named project worktrees so every
+    # run begins at the reviewed lock and can reapply them deterministically.
+    git -C "${project_dir}" reset --hard HEAD
+    git -C "${project_dir}" clean -fd
+}
+
+# Keep this list narrow: do not clean arbitrary Android source projects or the
+# persistent out/ and ccache directories.
+for patched_project in \
+    prebuilts/build-tools \
+    hardware/waydroid \
+    external/wayland-protocols \
+    system/core \
+    lineage-sdk; do
+    prepare_patched_project "${patched_project}"
+done
 
 apply_checked_patch() {
     local project_dir="$1"
@@ -108,10 +130,8 @@ apply_checked_patch() {
     local description="$3"
 
     [[ -s "${patch_file}" ]] || die "${description} patch missing: ${patch_file}"
-    # Some ordered Waydroid patches add source files which remain untracked in
-    # the persistent checkout after repo sync. Use the working tree rather
-    # than Git's index when checking/applying: the next patch can then be
-    # recognised as already applied on a repeat CI run.
+    # The project worktrees were reset and cleaned above. Use working-tree mode
+    # because a patch may add files needed by a following ordered patch.
     if git -C "${project_dir}" apply --no-index --check "${patch_file}"; then
         git -C "${project_dir}" apply --no-index "${patch_file}"
     elif git -C "${project_dir}" apply --no-index --reverse --check "${patch_file}"; then
