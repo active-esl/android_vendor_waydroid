@@ -47,6 +47,22 @@ android_dir="${ANDROID_WORKSPACE:-${repo_root}/.android-workspace}"
 mkdir -p "${android_dir}"
 cd "${android_dir}"
 
+# A preceding image build leaves reviewed compatibility patches as working-tree
+# edits in these exact projects. The resolver temporarily changes manifests;
+# reset only those known build-local edits before repo sync can remove/update a
+# project. Never clean the broad source cache or out/ directories here.
+for patched_project in \
+    prebuilts/build-tools \
+    hardware/waydroid \
+    external/wayland-protocols \
+    system/core \
+    lineage-sdk; do
+    if [[ -d "${patched_project}/.git" ]]; then
+        git -C "${patched_project}" reset --hard HEAD
+        git -C "${patched_project}" clean -fd
+    fi
+done
+
 repo init -u https://github.com/LineageOS/android.git \
     -b "${AESL_LINEAGE_BRANCH}" --git-lfs
 repo_sync_with_retries build/make
