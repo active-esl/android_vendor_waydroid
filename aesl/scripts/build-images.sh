@@ -160,6 +160,14 @@ apply_checked_patch \
     system/core \
     "${repo_root}/waydroid-patches/base-patches-33/system/core/0004-libsync-Add-sw_sync-symbols-to-map.patch" \
     "Waydroid libsync ABI"
+apply_checked_patch \
+    lineage-sdk \
+    "${repo_root}/waydroid-patches/base-patches-33/lineage-sdk/0001-sdk-Introduce-WayDroid-Service.patch" \
+    "Waydroid Lineage SDK service"
+apply_checked_patch \
+    lineage-sdk \
+    "${repo_root}/waydroid-patches/base-patches-33/lineage-sdk/0002-WayDroidHardware-Support-64-bit-timestamps-in-upgrad.patch" \
+    "Waydroid Lineage SDK timestamp API"
 
 # Android's generated environment and its lunch/m helpers read optional shell
 # variables without defaults. Keep nounset disabled for their complete lifecycle.
