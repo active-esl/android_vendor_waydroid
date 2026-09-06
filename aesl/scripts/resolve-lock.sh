@@ -24,7 +24,11 @@ repo_sync_with_retries() {
         if GIT_CONFIG_COUNT=1 \
             GIT_CONFIG_KEY_0=http.version \
             GIT_CONFIG_VALUE_0=HTTP/1.1 \
-            repo sync -c --no-tags --fail-fast --force-checkout \
+            # A lock refresh can change a project's backing object while the
+            # persistent cache retains older Repo metadata. Force-sync is
+            # required for that metadata transition; force-checkout alone
+            # only resets files in an existing worktree.
+            repo sync -c --no-tags --fail-fast --force-checkout --force-sync \
                 -j"${sync_jobs}" "$@"; then
             return 0
         fi
