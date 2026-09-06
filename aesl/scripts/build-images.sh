@@ -52,7 +52,6 @@ require_command ninja
 require_command glslangValidator
 require_command bison
 require_command flex
-require_command ccache
 
 # Mesa's generated sources use these modules through the runner's host Python.
 # Check them up front instead of discovering missing modules during Meson setup.
@@ -103,15 +102,19 @@ output_dir="${OUTPUT_DIR:-${repo_root}/out-aesl}"
 echo "AESL CI: preparing workspace at ${android_dir}"
 mkdir -p "${android_dir}" "${output_dir}"
 
-# Persist compiler results independently of a target's out/ tree. A source
-# lock change still invalidates affected entries, while repeated ARM64/x86_64
-# image builds avoid recompiling identical host/tool sources. Keep the cache
-# below the runner cache, not in a Git checkout or an uploaded artifact.
-export USE_CCACHE=1
-export CCACHE_DIR="${CCACHE_DIR:-/yocto/actions-runner-cache/aesl-android-ccache}"
-export CCACHE_MAXSIZE="${CCACHE_MAXSIZE:-100G}"
-export CCACHE_COMPRESS="${CCACHE_COMPRESS:-true}"
-mkdir -p "${CCACHE_DIR}"
+# Keep the baseline compiler flags by default so incremental image builds can
+# reuse their native outputs. USE_CCACHE changes Soong's global flags even when
+# CCACHE_EXEC is missing, causing a full rebuild without actually caching it.
+# Enabling ccache is an explicit opt-in because it changes compiler commands.
+export USE_CCACHE="${USE_CCACHE:-false}"
+if [[ "${USE_CCACHE}" == "true" || "${USE_CCACHE}" == "1" ]]; then
+    export CCACHE_EXEC="${CCACHE_EXEC:-$(command -v ccache)}"
+    [[ -x "${CCACHE_EXEC}" ]] || die "CCACHE_EXEC must name an executable ccache"
+    export CCACHE_DIR="${CCACHE_DIR:-/yocto/actions-runner-cache/aesl-android-ccache}"
+    export CCACHE_MAXSIZE="${CCACHE_MAXSIZE:-100G}"
+    export CCACHE_COMPRESS="${CCACHE_COMPRESS:-true}"
+    mkdir -p "${CCACHE_DIR}"
+fi
 
 # CT101 has 12 vCPUs and 40 GiB RAM. Ten compile jobs retain memory headroom
 # while using the available CPU more effectively than the former hard-coded 8.

@@ -347,7 +347,7 @@
   <project name="WayDroid/android_prebuilts_vndk_v28" path="prebuilts/vndk/v28" remote="ghub" revision="d5756439604b4e6c72417c5f95a5c0009ca0c1d9" upstream="refs/heads/lineage-20" dest-branch="refs/heads/lineage-20" groups="local::02-waydroid,pdk" clone-depth="1" />
   <project name="WayDroid/android_prebuilts_vndk_v29" path="prebuilts/vndk/v29" remote="ghub" revision="ef0283719cf05d7b0a79b62ad9464f98ce99b65f" upstream="refs/heads/lineage-20" dest-branch="refs/heads/lineage-20" groups="local::02-waydroid,pdk" clone-depth="1" />
   <project name="WayDroid/android_prebuilts_vndk_v30" path="prebuilts/vndk/v30" remote="ghub" revision="168a8caece8579177b7c4d19fc05f77113d4805f" upstream="refs/heads/lineage-20" dest-branch="refs/heads/lineage-20" groups="local::02-waydroid,pdk" clone-depth="1" />
-  <project name="active-esl/android_vendor_waydroid" path="vendor/extra" remote="ghub" revision="20efe7ecdb4a3dc205bb5bff13d5c6fde224aa6b" groups="local::02-waydroid" />
+  <project name="active-esl/android_vendor_waydroid" path="vendor/extra" remote="ghub" revision="64dbead6d96a26fdffb4fca533e4f640031f3f9c" groups="local::02-waydroid" />
   <project name="device/common" remote="aosp" revision="a9757e7e42dcdc40776b9961ec092095ad96e973" upstream="refs/tags/android-13.0.0_r75" dest-branch="refs/tags/android-13.0.0_r75" groups="pdk,pdk-cw-fs" />
   <project name="device/generic/arm64" remote="aosp" revision="c3df6ff97a7cc229da9e4e67840660a76bbcfcc1" upstream="refs/tags/android-13.0.0_r75" dest-branch="refs/tags/android-13.0.0_r75" groups="pdk" />
   <project name="device/generic/armv7-a-neon" remote="aosp" revision="0bd9a26a61f26a73f6f333a9e7b4b399e0c00fb4" upstream="refs/tags/android-13.0.0_r75" dest-branch="refs/tags/android-13.0.0_r75" groups="pdk" />
