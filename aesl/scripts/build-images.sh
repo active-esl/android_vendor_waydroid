@@ -108,9 +108,13 @@ apply_checked_patch() {
     local description="$3"
 
     [[ -s "${patch_file}" ]] || die "${description} patch missing: ${patch_file}"
-    if git -C "${project_dir}" apply --check "${patch_file}"; then
-        git -C "${project_dir}" apply "${patch_file}"
-    elif git -C "${project_dir}" apply --reverse --check "${patch_file}"; then
+    # Some ordered Waydroid patches add source files which remain untracked in
+    # the persistent checkout after repo sync. Use the working tree rather
+    # than Git's index when checking/applying: the next patch can then be
+    # recognised as already applied on a repeat CI run.
+    if git -C "${project_dir}" apply --no-index --check "${patch_file}"; then
+        git -C "${project_dir}" apply --no-index "${patch_file}"
+    elif git -C "${project_dir}" apply --no-index --reverse --check "${patch_file}"; then
         echo "${description} patch already applied"
     else
         die "${description} source does not match the reviewed patch"
