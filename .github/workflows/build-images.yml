@@ -17,7 +17,7 @@ jobs:
     runs-on: [self-hosted, Linux, esl-proxmox]
     timeout-minutes: 360
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install checksum-pinned repo launcher
         run: aesl/scripts/install-repo-tool.sh
       - name: Build locked Vanilla ARM64 images
@@ -25,7 +25,7 @@ jobs:
           ANDROID_WORKSPACE: /yocto/actions-runner-cache/aesl-android-source
           OUTPUT_DIR: ${{ github.workspace }}/out-aesl
         run: aesl/scripts/build-images.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: aesl-waydroid-arm64-${{ github.ref_name }}
           path: out-aesl/
