@@ -8,6 +8,40 @@ source "${script_dir}/common.sh"
 
 export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(git -C "${repo_root}" show -s --format=%ct HEAD)}"
 
+# GitHub Actions only tells the operator that a shell step is running.  Android
+# source sync and Ninja can each be quiet for many minutes, so emit a bounded
+# heartbeat without starting another build/polling process.  Keep the command
+# as the child so its exit status remains the CI result and cancellation also
+# terminates the child rather than leaving a sync or Ninja process behind.
+run_with_heartbeat() {
+    local phase="$1"
+    shift
+    local started_at command_pid heartbeat_pid status=0
+
+    started_at="$(date +%s)"
+    echo "AESL CI: ${phase} started"
+    "$@" &
+    command_pid=$!
+    (
+        while sleep 60; do
+            kill -0 "${command_pid}" 2>/dev/null || exit 0
+            printf 'AESL CI: %s still running (%ss; pid %s)\n' \
+                "${phase}" "$(( $(date +%s) - started_at ))" "${command_pid}"
+        done
+    ) &
+    heartbeat_pid=$!
+
+    trap 'kill -TERM "${command_pid}" "${heartbeat_pid}" 2>/dev/null || true; wait "${command_pid}" 2>/dev/null || true; exit 143' INT TERM HUP
+    wait "${command_pid}" || status=$?
+    kill "${heartbeat_pid}" 2>/dev/null || true
+    wait "${heartbeat_pid}" 2>/dev/null || true
+    trap - INT TERM HUP
+
+    printf 'AESL CI: %s finished in %ss (exit %s)\n' \
+        "${phase}" "$(( $(date +%s) - started_at ))" "${status}"
+    return "${status}"
+}
+
 require_command repo
 require_command git
 require_command sha256sum
@@ -116,10 +150,9 @@ fi
 echo "AESL CI: initialising repo from the reviewed source lock"
 repo init -u "file://${manifest_dir}" -m default.xml --git-lfs
 echo "AESL CI: synchronising locked Android sources (this is slow on a fresh target cache)"
-GIT_CONFIG_COUNT=1 \
-    GIT_CONFIG_KEY_0=http.version \
-GIT_CONFIG_VALUE_0=HTTP/1.1 \
-repo sync -c --no-tags --force-checkout -j"${JOBS:-8}"
+run_with_heartbeat "locked Android source sync" \
+    env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=http.version GIT_CONFIG_VALUE_0=HTTP/1.1 \
+    repo sync -c --no-tags --force-checkout -j"${JOBS:-8}"
 echo "AESL CI: source sync complete; applying verified Waydroid compatibility patches"
 
 prepare_patched_project() {
@@ -228,7 +261,8 @@ if [[ "${AESL_APPLY_WAYDROID_PATCHES:-false}" == "true" ]]; then
 fi
 export TARGET_USE_MESA=true
 lunch "${AESL_LUNCH_TARGET}"
-m -j"${build_jobs}" systemimage vendorimage
+run_with_heartbeat "Android system and vendor image build" \
+    m -j"${build_jobs}" systemimage vendorimage
 
 install -m 0644 "${OUT}/system.img" "${output_dir}/system.img"
 install -m 0644 "${OUT}/vendor.img" "${output_dir}/vendor.img"
