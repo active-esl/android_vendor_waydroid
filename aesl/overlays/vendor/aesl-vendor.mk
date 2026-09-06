@@ -4,8 +4,6 @@
 # separately tested integration lane, not in the reproducible vanilla system
 # image build.
 
-AESL_VENDOR_OVERLAY_PATH := $(call my-dir)
-
 PRODUCT_COPY_FILES += \
     $(AESL_VENDOR_OVERLAY_PATH)/etc/aesl/defaults.conf:$(TARGET_COPY_OUT_VENDOR)/etc/aesl/defaults.conf
 
