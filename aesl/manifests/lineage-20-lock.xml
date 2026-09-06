@@ -329,7 +329,7 @@
   <project name="LineageOS/contributors-cloud-generator" path="lineage/contributors-cloud-generator" revision="b4f0e2854ae40961b1028744df3503ac39792cab" upstream="main" dest-branch="main" groups="tools" />
   <project name="LineageOS/hudson" path="lineage/hudson" revision="744e820599b97795ca40f5e58445260e6822aa1d" upstream="main" dest-branch="main" groups="infra" />
   <project name="LineageOS/lineage_wiki" path="lineage/wiki" revision="4542b6bd3dea1c9377e4c42cf6664afeaace6168" upstream="main" dest-branch="main" groups="infra" />
-  <project name="LineageOS/mirror" path="lineage/mirror" revision="7bc35881c1786aedba2b230d6944de667e9ba8c9" upstream="main" dest-branch="main" groups="infra" />
+  <project name="LineageOS/mirror" path="lineage/mirror" revision="e8addfe7ca38ce1da1a427413a7317a01a2048a6" upstream="main" dest-branch="main" groups="infra" />
   <project name="LineageOS/scripts" path="lineage/scripts" revision="84a3bb946047eff566e13882289bcf791a94cfa7" upstream="main" dest-branch="main" groups="tools" />
   <project name="LineageOS/www" path="lineage/website" revision="cae5e9e3b212568716b865d7d532da72cb24c23b" upstream="main" dest-branch="main" groups="infra" />
   <project name="WayDroid/android_device_waydroid_waydroid" path="device/waydroid/waydroid" remote="ghub" revision="2234f4b75220be7065546a2a23f9a4091b8c77d4" upstream="refs/heads/lineage-20" dest-branch="refs/heads/lineage-20" groups="local::02-waydroid" />
@@ -347,7 +347,7 @@
   <project name="WayDroid/android_prebuilts_vndk_v28" path="prebuilts/vndk/v28" remote="ghub" revision="d5756439604b4e6c72417c5f95a5c0009ca0c1d9" upstream="refs/heads/lineage-20" dest-branch="refs/heads/lineage-20" groups="local::02-waydroid,pdk" clone-depth="1" />
   <project name="WayDroid/android_prebuilts_vndk_v29" path="prebuilts/vndk/v29" remote="ghub" revision="ef0283719cf05d7b0a79b62ad9464f98ce99b65f" upstream="refs/heads/lineage-20" dest-branch="refs/heads/lineage-20" groups="local::02-waydroid,pdk" clone-depth="1" />
   <project name="WayDroid/android_prebuilts_vndk_v30" path="prebuilts/vndk/v30" remote="ghub" revision="168a8caece8579177b7c4d19fc05f77113d4805f" upstream="refs/heads/lineage-20" dest-branch="refs/heads/lineage-20" groups="local::02-waydroid,pdk" clone-depth="1" />
-  <project name="active-esl/android_vendor_waydroid" path="vendor/extra" remote="ghub" revision="dda74162cbb43074d8c241b6a80ce9db77f74165" groups="local::02-waydroid" />
+  <project name="active-esl/android_vendor_waydroid" path="vendor/extra" remote="ghub" revision="fe8c775955ce921947b788a86aef4a13a214eefb" groups="local::02-waydroid" />
   <project name="device/common" remote="aosp" revision="a9757e7e42dcdc40776b9961ec092095ad96e973" upstream="refs/tags/android-13.0.0_r75" dest-branch="refs/tags/android-13.0.0_r75" groups="pdk,pdk-cw-fs" />
   <project name="device/generic/arm64" remote="aosp" revision="c3df6ff97a7cc229da9e4e67840660a76bbcfcc1" upstream="refs/tags/android-13.0.0_r75" dest-branch="refs/tags/android-13.0.0_r75" groups="pdk" />
   <project name="device/generic/armv7-a-neon" remote="aosp" revision="0bd9a26a61f26a73f6f333a9e7b4b399e0c00fb4" upstream="refs/tags/android-13.0.0_r75" dest-branch="refs/tags/android-13.0.0_r75" groups="pdk" />
