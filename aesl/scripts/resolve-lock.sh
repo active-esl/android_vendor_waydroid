@@ -82,4 +82,26 @@ sed -i \
     .repo/local_manifests/02-waydroid.xml
 
 repo_sync_with_retries
-repo manifest -r -o "${LOCK_OUTPUT:-${repo_root}/source-manifest.xml}"
+lock_output="${LOCK_OUTPUT:-${repo_root}/source-manifest.xml}"
+repo manifest -r -o "${lock_output}"
+
+# repo manifest -r pins every project to a commit but preserves the upstream
+# default branch attribute. With no project relying on that default, remove it
+# so the reviewed lock contains no mutable refs/heads revision at all.
+python3 - "${lock_output}" <<'PY'
+import sys
+from xml.etree import ElementTree
+
+path = sys.argv[1]
+tree = ElementTree.parse(path)
+root = tree.getroot()
+missing = [project.get("path", project.get("name", "<unknown>"))
+           for project in root.findall("project") if project.get("revision") is None]
+if missing:
+    raise SystemExit("cannot remove manifest default revision; projects lack explicit pins: "
+                     + ", ".join(missing))
+default = root.find("default")
+if default is not None:
+    default.attrib.pop("revision", None)
+tree.write(path, encoding="UTF-8", xml_declaration=True)
+PY
