@@ -66,6 +66,7 @@ lock_file="${SOURCE_LOCK:-${repo_root}/aesl/manifests/lineage-20-lock.xml}"
 
 android_dir="${ANDROID_WORKSPACE:-${repo_root}/.android-workspace}"
 output_dir="${OUTPUT_DIR:-${repo_root}/out-aesl}"
+echo "AESL CI: preparing workspace at ${android_dir}"
 mkdir -p "${android_dir}" "${output_dir}"
 
 # Persist compiler results independently of a target's out/ tree. A source
@@ -97,6 +98,7 @@ cd "${android_dir}"
 # repo through a local Git checkout: standalone XML mode leaves .repo/manifests
 # without Git metadata, causing repo to emit recovery errors on every run.
 manifest_dir="${android_dir}/.aesl-manifest"
+echo "AESL CI: creating reviewed local manifest"
 rm -rf "${manifest_dir}"
 git init --quiet "${manifest_dir}"
 git -C "${manifest_dir}" config user.name "AESL CI"
@@ -111,11 +113,14 @@ if [[ -d .repo ]]; then
     rm -rf .repo/local_manifests .repo/manifests .repo/manifests.git
     rm -f .repo/manifest.xml
 fi
+echo "AESL CI: initialising repo from the reviewed source lock"
 repo init -u "file://${manifest_dir}" -m default.xml --git-lfs
+echo "AESL CI: synchronising locked Android sources (this is slow on a fresh target cache)"
 GIT_CONFIG_COUNT=1 \
     GIT_CONFIG_KEY_0=http.version \
 GIT_CONFIG_VALUE_0=HTTP/1.1 \
 repo sync -c --no-tags --force-checkout -j"${JOBS:-8}"
+echo "AESL CI: source sync complete; applying verified Waydroid compatibility patches"
 
 prepare_patched_project() {
     local project_dir="$1"
