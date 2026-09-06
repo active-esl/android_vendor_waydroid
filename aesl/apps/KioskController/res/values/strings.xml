@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AESL Kiosk</string>
+    <string name="device_admin_description">Controls the AESL kiosk appliance when provisioned as device owner.</string>
+    <string name="unmanaged_message">Kiosk controller installed. Provision this app as Android device owner to enable kiosk lock-down.</string>
+    <string name="managed_message">AESL kiosk mode is active.</string>
+</resources>

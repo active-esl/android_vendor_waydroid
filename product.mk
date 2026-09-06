@@ -34,6 +34,11 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/waydroid.prop:$(TARGET_COPY_OUT_VENDOR)/waydroid.prop
 
+# Active ESL product-owned vendor configuration. Keep this limited to vendor
+# content so the locked LineageOS system image remains a separately reusable
+# vanilla artifact.
+include $(LOCAL_PATH)/aesl/overlays/vendor/aesl-vendor.mk
+
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     ro.setupwizard.mode=DISABLED
 
