@@ -18,6 +18,11 @@ LOCAL_PATH := $(call my-dir)
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
 
+# The kiosk controller is a product package rather than a HAL module. Include
+# it explicitly: the legacy recursive Android.mk discovery used by this vendor
+# tree does not descend into the AESL application subtree.
+include $(LOCAL_PATH)/aesl/apps/KioskController/Android.mk
+
 include $(CLEAR_VARS)
 
 HOST_PERMS_MOUNT_POINT := $(TARGET_OUT_VENDOR_ETC)/host-permissions
