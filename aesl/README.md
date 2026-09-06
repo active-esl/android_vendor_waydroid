@@ -21,6 +21,15 @@ the same decoder. Set `AESL_APPLY_WAYDROID_PATCHES=true` only in a dedicated
 runtime-integration lane after that broader patch stack has been rebased and
 tested against the locked source manifest.
 
+## Framework laptop test lane
+
+The **Build AESL Waydroid x86_64 test images** workflow builds
+`lineage_waydroid_x86_64-userdebug` from the same reviewed source lock. It
+uses a separate Android workspace and artifact name so it can be installed in
+Waydroid on an x86_64 Linux Framework laptop without affecting the ARM64
+release-image lane. Tag a reviewed revision `aesl-waydroid-x86_64-v*` to run
+this lane.
+
 ## Source locking
 
 Android is a multi-repository build. A branch name alone is not reproducible.

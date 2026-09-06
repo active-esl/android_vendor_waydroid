@@ -5,7 +5,7 @@ set -euo pipefail
 # shellcheck disable=SC2034
 readonly AESL_LINEAGE_BRANCH="lineage-20.0"
 # shellcheck disable=SC2034
-readonly AESL_LUNCH_TARGET="lineage_waydroid_arm64-userdebug"
+readonly AESL_LUNCH_TARGET="${AESL_LUNCH_TARGET:-lineage_waydroid_arm64-userdebug}"
 
 die() {
     echo "error: $*" >&2

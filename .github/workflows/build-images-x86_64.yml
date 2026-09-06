@@ -1,0 +1,36 @@
+name: Build AESL Waydroid x86_64 test images
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['aesl-waydroid-x86_64-v*']
+
+permissions:
+  contents: read
+
+# Keep this lane independent of the ARM64 release build. Its source checkout
+# and output cache are deliberately separate as Android's out/ is target-bound.
+concurrency:
+  group: aesl-waydroid-images-x86_64
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: [self-hosted, Linux, esl-proxmox]
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install checksum-pinned repo launcher
+        run: aesl/scripts/install-repo-tool.sh
+      - name: Build locked x86_64 test images
+        env:
+          AESL_LUNCH_TARGET: lineage_waydroid_x86_64-userdebug
+          ANDROID_WORKSPACE: /yocto/actions-runner-cache/aesl-android-source-x86_64
+          OUTPUT_DIR: ${{ github.workspace }}/out-aesl-x86_64
+        run: aesl/scripts/build-images.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aesl-waydroid-x86_64-${{ github.ref_name }}
+          path: out-aesl-x86_64/
+          if-no-files-found: error
+          retention-days: 30
