@@ -18,6 +18,7 @@ require_command ninja
 require_command glslangValidator
 require_command bison
 require_command flex
+require_command ccache
 
 # Mesa's generated sources use these modules through the runner's host Python.
 # Check them up front instead of discovering missing modules during Meson setup.
@@ -66,6 +67,20 @@ lock_file="${SOURCE_LOCK:-${repo_root}/aesl/manifests/lineage-20-lock.xml}"
 android_dir="${ANDROID_WORKSPACE:-${repo_root}/.android-workspace}"
 output_dir="${OUTPUT_DIR:-${repo_root}/out-aesl}"
 mkdir -p "${android_dir}" "${output_dir}"
+
+# Persist compiler results independently of a target's out/ tree. A source
+# lock change still invalidates affected entries, while repeated ARM64/x86_64
+# image builds avoid recompiling identical host/tool sources. Keep the cache
+# below the runner cache, not in a Git checkout or an uploaded artifact.
+export USE_CCACHE=1
+export CCACHE_DIR="${CCACHE_DIR:-/yocto/actions-runner-cache/aesl-android-ccache}"
+export CCACHE_MAXSIZE="${CCACHE_MAXSIZE:-100G}"
+export CCACHE_COMPRESS="${CCACHE_COMPRESS:-true}"
+mkdir -p "${CCACHE_DIR}"
+
+# CT101 has 12 vCPUs and 40 GiB RAM. Ten compile jobs retain memory headroom
+# while using the available CPU more effectively than the former hard-coded 8.
+build_jobs="${JOBS:-10}"
 
 # LineageOS 20 still invokes `python` in a few host tools. The runner provides
 # Python 3 as `python3`; provide a workspace-local compatibility name without
@@ -208,7 +223,7 @@ if [[ "${AESL_APPLY_WAYDROID_PATCHES:-false}" == "true" ]]; then
 fi
 export TARGET_USE_MESA=true
 lunch "${AESL_LUNCH_TARGET}"
-m -j"${JOBS:-8}" systemimage vendorimage
+m -j"${build_jobs}" systemimage vendorimage
 
 install -m 0644 "${OUT}/system.img" "${output_dir}/system.img"
 install -m 0644 "${OUT}/vendor.img" "${output_dir}/vendor.img"
