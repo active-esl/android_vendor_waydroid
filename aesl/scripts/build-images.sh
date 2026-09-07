@@ -158,6 +158,24 @@ run_with_heartbeat "locked Android source sync" \
     repo sync -c --no-tags --force-checkout -j"${JOBS:-8}"
 echo "AESL CI: source sync complete; applying verified Waydroid compatibility patches"
 
+# repo sync does not remove old standalone Git checkouts that are no longer in
+# the manifest.  CT101 previously carried NXP's full Android multimedia tree;
+# its Android.bp files are discovered globally by Soong and make the locked,
+# generic V4L2 Codec2 build depend on unpinned proprietary parser sources.
+# Remove only these known stale paths, and refuse to do so if either becomes a
+# reviewed project in a future lock.
+for stale_source_path in \
+    vendor/nxp/imx_android_mm \
+    vendor/nxp/fsl-proprietary; do
+    if grep -Fxq "${stale_source_path}" .repo/project.list; then
+        die "refusing to remove manifest-owned source path: ${stale_source_path}"
+    fi
+    if [[ -e "${stale_source_path}" ]]; then
+        echo "AESL CI: removing stale non-manifest source path ${stale_source_path}"
+        rm -rf -- "${stale_source_path}"
+    fi
+done
+
 prepare_patched_project() {
     local project_dir="$1"
 

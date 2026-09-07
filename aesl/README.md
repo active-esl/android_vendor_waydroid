@@ -67,6 +67,10 @@ NXP's `vsiv4l2` kernel module and binds its `vsi_v4l2dec` video node into the
 Waydroid container before Android starts. The matching Foundries integration
 does this automatically.
 
+This integration deliberately uses Android's lock-pinned generic V4L2 Codec2
+adapter over the NXP kernel VPU interface. It does not import NXP's full Android
+multimedia/parser tree or any unpinned proprietary userspace source.
+
 Runtime acceptance requires all of the following:
 
 1. `dumpsys media.codec` lists `c2.v4l2.avc.decoder` ahead of the Google
