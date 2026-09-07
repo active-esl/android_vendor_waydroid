@@ -13,6 +13,14 @@ The pipeline produces:
 Google applications are deliberately excluded. Signing and release publication
 are separate protected stages; development images are not production releases.
 
+The Jaguar ARM64 product is a single-purpose 2 GB kiosk, not an Android TV
+desktop. Its reviewed device patch enables Android's low-RAM mode, uses a
+128/256 MiB Dalvik growth/maximum heap, bounds the cached-process pool, applies
+PSI-aware LMKD thresholds for compressed swap, disables task snapshots, and
+removes the stock launcher, updater and unused consumer applications. The
+Active ESL kiosk controller remains the sole HOME activity. The Linux host
+provides lz4 zram; verify that independently during hardware acceptance.
+
 The normal image workflow does not apply Waydroid's framework/core patch stack:
 it produces the locked vanilla LineageOS system image paired with the Waydroid
 vendor image. The sole exception is the upstream init host-UID decoder patch;

@@ -172,6 +172,7 @@ prepare_patched_project() {
 # Keep this list narrow: do not clean arbitrary Android source projects or the
 # persistent out/ and ccache directories.
 for patched_project in \
+    device/waydroid/waydroid \
     prebuilts/build-tools \
     hardware/waydroid \
     external/wayland-protocols \
@@ -201,6 +202,11 @@ apply_checked_patch() {
 # build-tools-only patch exposes the already locked prebuilts/mesa-tools
 # binaries to the Android build PATH.  It does not alter the vanilla Android
 # framework/core source lane.
+apply_checked_patch \
+    device/waydroid/waydroid \
+    "${repo_root}/aesl/patches/0002-waydroid-arm64-2gb-kiosk-profile.patch" \
+    "Active ESL 2 GB kiosk profile"
+
 apply_checked_patch \
     prebuilts/build-tools \
     "${repo_root}/waydroid-patches/base-patches-33/prebuilts/build-tools/0001-Add-prebuilt-mesa-tools-to-PATH.patch" \

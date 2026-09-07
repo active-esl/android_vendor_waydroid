@@ -1,0 +1,99 @@
+diff --git a/overlay/frameworks/base/core/res/res/values/config.xml b/overlay/frameworks/base/core/res/res/values/config.xml
+index 54a7698..e590ab3 100644
+--- a/overlay/frameworks/base/core/res/res/values/config.xml
++++ b/overlay/frameworks/base/core/res/res/values/config.xml
+@@ -25,4 +25,9 @@
+     <!-- The device supports freeform window management -->
+     <bool name="config_freeformWindowManagement">true</bool>
+ 
++    <!-- AESL Jaguar is a single-application 2 GB appliance. Bound cached
++         processes and avoid retaining task snapshot graphics in RAM. -->
++    <integer name="config_customizedMaxCachedProcesses">8</integer>
++    <bool name="config_disableTaskSnapshots">true</bool>
++
+ </resources>
+diff --git a/remove_packages/Android.mk b/remove_packages/Android.mk
+index 77131bd..81d083c 100644
+--- a/remove_packages/Android.mk
++++ b/remove_packages/Android.mk
+@@ -4,7 +4,32 @@ include $(CLEAR_VARS)
+ LOCAL_MODULE := RemovePackages
+ LOCAL_MODULE_CLASS := APPS
+ LOCAL_MODULE_TAGS := optional
+-LOCAL_OVERRIDES_PACKAGES := AudioFX Bluetooth BluetoothMidiService
++LOCAL_OVERRIDES_PACKAGES := \
++    Aperture \
++    ApertureLensLauncher \
++    AudioFX \
++    Backgrounds \
++    BasicDreams \
++    Bluetooth \
++    BluetoothMidiService \
++    BuiltInPrintService \
++    DeskClock \
++    EasterEgg \
++    Eleven \
++    Etar \
++    ExactCalculator \
++    Gallery2 \
++    Jelly \
++    LiveWallpapersPicker \
++    NfcNci \
++    PhotoTable \
++    PrintRecommendationService \
++    PrintSpooler \
++    Recorder \
++    Seedvault \
++    ThemePicker \
++    TrebuchetQuickStep \
++    WaydroidUpdater
+ LOCAL_UNINSTALLABLE_MODULE := true
+ LOCAL_CERTIFICATE := PRESIGNED
+ LOCAL_SRC_FILES := /dev/null
+diff --git a/system.prop b/system.prop
+index de8cf1d..eaa62a0 100644
+--- a/system.prop
++++ b/system.prop
+@@ -5,13 +5,15 @@ import /vendor_extra/build.prop vendor.gralloc.disable_ubwc
+ af.thread.throttle=false
+ audio.deep_buffer.media=true
+ 
+-# Provides overrides to configure the Dalvik heap for a 4GB phone
++# Active ESL Jaguar 2 GB kiosk heap. Keep a single application responsive
++# without allowing one process to consume a quarter of physical RAM.
++ro.config.low_ram=true
+ dalvik.vm.heapstartsize=8m
+-dalvik.vm.heapgrowthlimit=192m
+-dalvik.vm.heapsize=512m
+-dalvik.vm.heaptargetutilization=0.6
+-dalvik.vm.heapminfree=8m
+-dalvik.vm.heapmaxfree=16m
++dalvik.vm.heapgrowthlimit=128m
++dalvik.vm.heapsize=256m
++dalvik.vm.heaptargetutilization=0.75
++dalvik.vm.heapminfree=2m
++dalvik.vm.heapmaxfree=8m
+ 
+ # SurfaceFlinger
+ ro.surface_flinger.max_frame_buffer_acquired_buffers=3
+@@ -28,9 +30,15 @@ persist.sys.disable_rescue=true
+ ro.lmk.low=1001
+ ro.lmk.medium=800
+ ro.lmk.critical=0
+-ro.lmk.critical_upgrade=false
+-ro.lmk.upgrade_pressure=100
+-ro.lmk.downgrade_pressure=100
+-ro.lmk.kill_heaviest_task=true
++ro.lmk.critical_upgrade=true
++ro.lmk.upgrade_pressure=40
++ro.lmk.downgrade_pressure=60
++ro.lmk.kill_heaviest_task=false
+ ro.lmk.kill_timeout_ms=100
+-ro.lmk.use_minfree_levels=true
++ro.lmk.use_minfree_levels=false
++ro.lmk.swap_free_low_percentage=10
++ro.lmk.thrashing_limit=30
++ro.lmk.thrashing_limit_decay=50
++ro.lmk.psi_partial_stall_ms=200
++ro.lmk.psi_complete_stall_ms=700
++ro.lmk.swap_compression_ratio=3
