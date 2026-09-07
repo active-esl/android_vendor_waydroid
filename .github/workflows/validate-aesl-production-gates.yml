@@ -21,3 +21,5 @@ jobs:
             echo 'AESL production branch must not bypass SELinux neverallow rules' >&2
             exit 1
           fi
+      - name: Require complete runtime SELinux exception inventory
+        run: python3 scripts/check-selinux-runtime-gate.py

@@ -1,0 +1,33 @@
+{
+  "risk_id": "AESL-WAYDROID-SELINUX-001",
+  "status": "open",
+  "owner": "Active ESL product security",
+  "approved_by": null,
+  "approved_at": null,
+  "review_by": null,
+  "rationale": "Waydroid shares the host kernel and Linux does not provide an independent SELinux policy namespace for the Android container. The upstream integration therefore bypasses Android SELinux operations. This is a release risk requiring explicit acceptance; build-time neverallow enforcement alone does not mitigate it.",
+  "compensating_controls": [
+    "Host LXC namespaces, cgroup device policy, seccomp and AppArmor confinement remain enabled and are verified on the shipping image.",
+    "Only the selected Etnaviv render node, allowlisted DMA heaps and capability-selected NXP decoder are exposed to Android.",
+    "Android application UID separation and non-root media services remain enabled; privileged debugging is disabled in production.",
+    "The container root filesystem is built from an immutable source lock and shipped with checksummed SBOM and build evidence.",
+    "The exception and upstream kernel/container isolation options are reviewed for every supported security release."
+  ],
+  "patches": [
+    "waydroid-patches/base-patches-36/device/lineage/sepolicy/0001-Remove-conflicting-selinux-labels.patch",
+    "waydroid-patches/base-patches-36/external/selinux/0001-ignore-selinux.patch",
+    "waydroid-patches/base-patches-36/external/selinux/0002-Suppress-SELinux-logs.patch",
+    "waydroid-patches/base-patches-36/frameworks/base/0001-waydroid-disable-SELinux-parts.patch",
+    "waydroid-patches/base-patches-36/frameworks/base/0003-waydroid-disable-app-dir-isolation-using-SELinux.patch",
+    "waydroid-patches/base-patches-36/frameworks/native/0001-installd-run-without-SELinux.patch",
+    "waydroid-patches/base-patches-36/frameworks/native/0002-halium-disable-SELinux-checks-in-ServiceManager.patch",
+    "waydroid-patches/base-patches-36/frameworks/native/0003-halium-never-set-FLAT_BINDER_FLAG_TXN_SECURITY_CTX-f.patch",
+    "waydroid-patches/base-patches-36/lineage-sdk/0008-trust-Suppress-SELinux-warning.patch",
+    "waydroid-patches/base-patches-36/packages/modules/adb/0001-adb-Disable-selinux-when-root.patch",
+    "waydroid-patches/base-patches-36/system/core/0001-waydroid-init-start-inside-LXC-container-without-SEL.patch",
+    "waydroid-patches/base-patches-36/system/hwservicemanager/0001-halium-disable-SELinux-parts.patch",
+    "waydroid-patches/base-patches-36/system/libhwbinder/0001-Never-set-FLAT_BINDER_FLAG_TXN_SECURITY_CTX-flag.patch",
+    "waydroid-patches/base-patches-36/system/security/0001-keystore2-Ignore-selinux-checks.patch",
+    "waydroid-patches/base-patches-36/system/vold/0004-vold-Drop-selinux-checks-on-prepare_subdirs.patch"
+  ]
+}
