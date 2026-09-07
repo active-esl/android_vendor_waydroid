@@ -40,6 +40,26 @@ PRODUCT_COPY_FILES += \
 AESL_VENDOR_OVERLAY_PATH := $(LOCAL_PATH)/aesl/overlays/vendor
 include $(LOCAL_PATH)/aesl/overlays/vendor/aesl-vendor.mk
 
+# Jaguar i.MX8MM hardware video decode. The host exposes NXP's stateful
+# vsi_v4l2dec node to the ARM64 container; this Codec2 service presents it to
+# Android MediaCodec as c2.v4l2.avc.decoder.
+ifneq ($(filter %_waydroid_arm64 %_waydroid_arm64_only,$(TARGET_PRODUCT)),)
+PRODUCT_SOONG_NAMESPACES += external/v4l2_codec2
+
+PRODUCT_PACKAGES += \
+    android.hardware.media.c2@1.0-service-v4l2 \
+    libc2plugin_store
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/aesl/imx8mm-codec2/media_codecs_c2.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs_c2.xml \
+    $(LOCAL_PATH)/aesl/imx8mm-codec2/codec2.vendor.ext.policy:$(TARGET_COPY_OUT_VENDOR)/etc/seccomp_policy/codec2.vendor.ext.policy \
+    $(LOCAL_PATH)/aesl/imx8mm-codec2/manifest_media_c2.xml:$(TARGET_COPY_OUT_VENDOR)/etc/vintf/manifest/aesl_media_c2.xml
+
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.vendor.v4l2_codec2.decode_concurrent_instances=1 \
+    debug.stagefright.c2-poolmask=0xfc0000
+endif
+
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
     ro.setupwizard.mode=DISABLED
 

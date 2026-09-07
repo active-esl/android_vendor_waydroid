@@ -50,3 +50,20 @@ directories should be persistent between builds.
 Foundries must consume a released pair by immutable version and SHA-256, rather
 than downloading Waydroid's rolling SourceForge channel. Keep the system and
 vendor images paired from the same Active ESL build.
+
+## i.MX8MM hardware video decode
+
+The ARM64 vendor image includes Android's stateful V4L2 Codec2 service and
+registers `c2.v4l2.avc.decoder`. On the Jaguar screen target, the host loads
+NXP's `vsiv4l2` kernel module and binds its `vsi_v4l2dec` video node into the
+Waydroid container before Android starts. The matching Foundries integration
+does this automatically.
+
+Runtime acceptance requires all of the following:
+
+1. `dumpsys media.codec` lists `c2.v4l2.avc.decoder` ahead of the Google
+   software AVC decoder.
+2. H.264 playback remains visible on the physical Jaguar display.
+3. Codec logs name `c2.v4l2.avc.decoder` for the playback session.
+4. Host tracing or driver counters show activity on `vsi_v4l2dec` while the
+   clip plays.

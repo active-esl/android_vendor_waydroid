@@ -27,7 +27,8 @@ jobs:
         run: aesl/scripts/build-images.sh
       - uses: actions/upload-artifact@v7
         with:
-          name: aesl-waydroid-arm64-${{ github.ref_name }}
+          # github.ref_name may contain '/', which artifact names reject.
+          name: aesl-waydroid-arm64-${{ github.sha }}
           path: out-aesl/
           if-no-files-found: error
           retention-days: 30
