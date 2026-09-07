@@ -22,4 +22,6 @@ jobs:
             exit 1
           fi
       - name: Require complete runtime SELinux exception inventory
-        run: python3 scripts/check-selinux-runtime-gate.py
+        run: |
+          python3 scripts/check-selinux-runtime-gate.py
+          grep -Fq 'selinux-runtime-exception.json:$(TARGET_COPY_OUT_VENDOR)/etc/aesl/selinux-runtime-exception.json' product.mk

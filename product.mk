@@ -34,6 +34,12 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/waydroid.prop:$(TARGET_COPY_OUT_VENDOR)/waydroid.prop
 
+# Retain the reviewed runtime-SELinux exception record in every generated
+# image. Its status remains "open" until product security formally accepts or
+# eliminates the risk; the production gate checks that decision separately.
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/security/selinux-runtime-exception.json:$(TARGET_COPY_OUT_VENDOR)/etc/aesl/selinux-runtime-exception.json
+
 # PC mode
 PRODUCT_PACKAGES += \
     pc.xml
