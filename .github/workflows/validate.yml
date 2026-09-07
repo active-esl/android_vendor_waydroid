@@ -22,18 +22,27 @@ jobs:
           python3 - <<'PY'
           import sys
           from pathlib import Path
+          from urllib.parse import urlparse
           from xml.etree import ElementTree
 
           failures = []
           for lock_file in Path("aesl/manifests").glob("*-lock.xml"):
               root = ElementTree.parse(lock_file).getroot()
+              for remote in root.findall("remote"):
+                  fetch = remote.get("fetch", "")
+                  parsed = urlparse(fetch)
+                  if not parsed.scheme:
+                      failures.append(
+                          f"{lock_file}: <remote name={remote.get('name')!r}> "
+                          f"fetch={fetch!r} is not absolute"
+                      )
               for element in root.iter():
                   value = element.get("revision")
                   if value is not None and value.startswith("refs/heads/"):
                       failures.append(f"{lock_file}: <{element.tag}> revision={value!r}")
 
           if failures:
-              print("Source-lock revision attributes must not reference mutable branches:", *failures,
+              print("Source-lock policy failures:", *failures,
                     sep="\n", file=sys.stderr)
               sys.exit(1)
           PY

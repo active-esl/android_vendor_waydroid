@@ -103,5 +103,13 @@ if missing:
 default = root.find("default")
 if default is not None:
     default.attrib.pop("revision", None)
+
+# Lineage's source manifest defines its GitHub remote relative to the manifest
+# repository (fetch="..").  The reviewed lock is later served from a local Git
+# repository, where that relative URL would incorrectly resolve inside the
+# Android workspace.  Make the flattened lock independent of its serving URL.
+for remote in root.findall("remote"):
+    if remote.get("name") == "github" and remote.get("fetch") == "..":
+        remote.set("fetch", "https://github.com/")
 tree.write(path, encoding="UTF-8", xml_declaration=True)
 PY

@@ -2,7 +2,7 @@
 <manifest>
   <remote name="aosp" fetch="https://android.googlesource.com" review="android-review.googlesource.com" revision="refs/tags/android-13.0.0_r75" />
   <remote name="ghub" fetch="https://github.com/" />
-  <remote name="github" fetch=".." review="review.lineageos.org" />
+  <remote name="github" fetch="https://github.com/" review="review.lineageos.org" />
   <remote name="gitlab" fetch="https://gitlab.com/" />
   <remote name="private" fetch="ssh://git@github.com" />
   
