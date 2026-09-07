@@ -1,0 +1,23 @@
+name: Validate AESL production gates
+
+on:
+  push:
+    branches: [lineage-23.2-aesl]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require SELinux neverallow enforcement
+        run: |
+          if grep -R --line-number --fixed-strings --exclude-dir=.git \
+              --include='*.mk' --include='*.bp' --include='*.te' \
+              'SELINUX_IGNORE_NEVERALLOWS := true' .; then
+            echo 'AESL production branch must not bypass SELinux neverallow rules' >&2
+            exit 1
+          fi

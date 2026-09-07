@@ -21,4 +21,5 @@ BOARD_ROOT_EXTRA_FOLDERS := odm_extra vendor_extra mnt_extra run var tmp
 
 # Sepolicy
 SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(EXTRA_VENDOR_PATH)/sepolicy/private
-SELINUX_IGNORE_NEVERALLOWS := true
+# Production images must enforce the platform neverallow contract. Do not set
+# SELINUX_IGNORE_NEVERALLOWS here; policy violations are blocking build errors.
