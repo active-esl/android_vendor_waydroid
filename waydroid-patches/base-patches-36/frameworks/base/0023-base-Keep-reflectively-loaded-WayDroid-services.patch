@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Active ESL <engineering@active-esl.com>
+Date: Thu, 10 Sep 2026 15:00:00 +0100
+Subject: [PATCH] base: Keep reflectively loaded WayDroid services
+
+WaySystemServer obtains the WayDroid service class name from
+config_externalWayDroidServices and passes it to SystemServiceManager as a
+string. R8 cannot see that reflective reference and removes WayDroidService
+from services.jar when system Java shrinking is enabled.
+
+Keep the WayDroid server package so the configured service remains available
+to the system_server class loader at runtime.
+---
+ services/proguard.flags | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/services/proguard.flags b/services/proguard.flags
+index 8f2722d..7363924 100644
+--- a/services/proguard.flags
++++ b/services/proguard.flags
+@@ -125,4 +125,5 @@
+ -keep,allowoptimization,allowaccessmodification class vendor.lineage.** { *; }
+ 
+ # Waydroid
++-keep,allowoptimization,allowaccessmodification class id.waydro.server.** { *; }
+ -dontwarn vendor.waydroid.**
+-- 
+2.51.0
+
