@@ -1,0 +1,60 @@
+From 1198ad1f98798daee6afef9121fca45d53efbf5c Mon Sep 17 00:00:00 2001
+From: Active ESL <engineering@active-esl.com>
+Date: Thu, 10 Sep 2026 19:45:00 +0100
+Subject: [PATCH] base: Fallback when new aconfig storage is unavailable
+
+Waydroid does not provide a normal Android metadata partition. Even when the
+runtime supplies writable metadata and aconfigd creates its maps, zygote can
+initialize AconfigPackage before those maps are usable and cache an empty
+package table. Framework manifest parsing then drops flagged permissions while
+generated framework callers retain their compiled read-only values.
+
+Load the immutable proto table as a fallback and use it only when a package
+lookup in new storage fails. Healthy new-storage values remain authoritative.
+---
+ .../internal/pm/pkg/component/AconfigFlags.java   | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/core/java/com/android/internal/pm/pkg/component/AconfigFlags.java b/core/java/com/android/internal/pm/pkg/component/AconfigFlags.java
+index 3adcb1d4ddf0..62e638679269 100644
+--- a/core/java/com/android/internal/pm/pkg/component/AconfigFlags.java
++++ b/core/java/com/android/internal/pm/pkg/component/AconfigFlags.java
+@@ -65,6 +65,26 @@ public class AconfigFlags {
+ 
+         if (useNewStorage()) {
+             Slog.i(LOG_TAG, "Using new flag storage");
++            // Keep the immutable proto values available as an early-boot
++            // fallback. Waydroid may expose /metadata before the new storage
++            // maps are usable by zygote and system_server.
++            final var defaultFlagProtoFiles =
++                    (Process.myUid() == Process.SYSTEM_UID) ? DeviceProtos.parsedFlagsProtoPaths()
++                            : Arrays.asList(DeviceProtos.PATHS);
++            for (String fileName : defaultFlagProtoFiles) {
++                final File protoFile = new File(fileName);
++                if (!protoFile.isFile() || !protoFile.canRead()) {
++                    continue;
++                }
++                try (var inputStream = new FileInputStream(protoFile)) {
++                    loadAconfigDefaultValues(inputStream.readAllBytes());
++                } catch (IOException e) {
++                    Slog.w(LOG_TAG, "Failed to read Aconfig values from " + fileName, e);
++                }
++            }
++            if (Process.myUid() == Process.SYSTEM_UID) {
++                loadServerOverrides();
++            }
+         } else {
+             Slog.i(LOG_TAG, "Using OLD proto flag storage");
+             final var defaultFlagProtoFiles =
+@@ -223,7 +243,8 @@ public class AconfigFlags {
+     @Nullable
+     public Boolean getFlagValue(@NonNull String flagPackageAndName) {
+         if (useNewStorage()) {
+-            return getFlagValueFromNewStorage(flagPackageAndName);
++            final Boolean value = getFlagValueFromNewStorage(flagPackageAndName);
++            return value != null ? value : mFlagValues.get(flagPackageAndName);
+         } else {
+             Boolean value = mFlagValues.get(flagPackageAndName);
+             if (DEBUG) {
+-- 
+2.43.0
