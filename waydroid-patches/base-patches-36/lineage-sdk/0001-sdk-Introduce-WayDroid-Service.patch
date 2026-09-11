@@ -7,7 +7,6 @@ Change-Id: Ic8c45e896b7f08b371aaa78c75188679b4f36ce0
 Signed-off-by: SupeChicken666 <me@supechicken666.dev>
 ---
  .../platform/internal/WayDroidService.java    | 468 ++++++++++++++++++
- lineage/res/res/values/config.xml             |   1 +
  .../app/LineageContextConstants.java          |  28 ++
  sdk/src/java/lineageos/waydroid/AppInfo.aidl  |  20 +
  sdk/src/java/lineageos/waydroid/AppInfo.java  |  57 +++
@@ -19,7 +18,7 @@ Signed-off-by: SupeChicken666 <me@supechicken666.dev>
  .../java/lineageos/waydroid/IUserMonitor.aidl |  23 +
  sdk/src/java/lineageos/waydroid/Platform.java | 235 +++++++++
  .../java/lineageos/waydroid/UserMonitor.java  | 100 ++++
- 13 files changed, 1257 insertions(+)
+ 12 files changed, 1256 insertions(+)
  create mode 100644 lineage/lib/main/java/org/lineageos/platform/internal/WayDroidService.java
  create mode 100644 sdk/src/java/lineageos/waydroid/AppInfo.aidl
  create mode 100644 sdk/src/java/lineageos/waydroid/AppInfo.java
@@ -506,18 +505,6 @@ index 00000000..474492d0
 +        }
 +    };
 +}
-diff --git a/lineage/res/res/values/config.xml b/lineage/res/res/values/config.xml
-index e7290737..74ff96f8 100644
---- a/lineage/res/res/values/config.xml
-+++ b/lineage/res/res/values/config.xml
-@@ -107,6 +107,7 @@
-         <item>org.lineageos.platform.internal.LineageSettingsService</item>
-         <item>org.lineageos.platform.internal.LineageGlobalActionsService</item>
-         <item>org.lineageos.platform.internal.health.HealthInterfaceService</item>
-+        <item>org.lineageos.platform.internal.WayDroidService</item>
-     </string-array>
- 
-     <!-- The LineageSystemServer class that is invoked from Android's SystemServer -->
 diff --git a/sdk/src/java/lineageos/app/LineageContextConstants.java b/sdk/src/java/lineageos/app/LineageContextConstants.java
 index 84acb541..636b77c7 100644
 --- a/sdk/src/java/lineageos/app/LineageContextConstants.java
