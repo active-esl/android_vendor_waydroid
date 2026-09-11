@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: AESL Android CI <ci@active-esl.invalid>
+Date: Fri, 11 Sep 2026 13:10:00 +0100
+Subject: [PATCH] soong: Allow CI to bound builder Go heap
+
+Large Android product graphs can otherwise consume all available host memory
+while soong_build analyzes Android.bp files. Pass a separately named build
+setting into the sanitized builder environment as the standard Go runtime
+GOMEMLIMIT variable.
+
+The limit remains opt-in, so normal Android builds are unchanged.
+---
+ ui/build/soong.go | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/ui/build/soong.go b/ui/build/soong.go
+index a271246..eb60c32 100644
+--- a/ui/build/soong.go
++++ b/ui/build/soong.go
+@@ -241,5 +241,8 @@ func (pb primaryBuilder) invocation() bootstrap.PrimaryBuilderInvocation {
+ 		// https://github.com/golang/proposal/blob/master/design/24543-non-cooperative-preemption.md
+ 		invocationEnv["GODEBUG"] = "asyncpreemptoff=1"
++	}
++	if memoryLimit := os.Getenv("SOONG_GOMEMLIMIT"); memoryLimit != "" {
++		invocationEnv["GOMEMLIMIT"] = memoryLimit
+ 	}
+ 
+ 	var allArgs []string
+-- 
+2.39.5
