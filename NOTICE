@@ -1,0 +1,7 @@
+AESL Waydroid vendor integration
+Copyright 2026 Active ESL
+
+This fork contains third-party Waydroid, Android and patch material. Preserve
+all file-level copyright and licence notices. See LICENSE.md and LICENSES/ for
+the applicable licence texts and exceptions. A product build must also retain
+the generated NOTICE archives, delivered-artifact SBOM and binary risk record.
