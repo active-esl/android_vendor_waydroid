@@ -25,9 +25,11 @@ The normal image workflow does not apply Waydroid's broad framework/core patch
 stack: it produces the locked LineageOS system image paired with the Waydroid
 vendor image. It does apply the minimal upstream runtime compatibility needed
 to boot inside LXC: the ordered first-stage/mount-all init pair, the libsync ABI
-export and the dynamic host-UID decoder. Set `AESL_APPLY_WAYDROID_PATCHES=true`
-only in a dedicated runtime-integration lane after the broader patch stack has
-been rebased and tested against the locked source manifest.
+export, the dynamic host-UID decoder, and non-fatal handling when the container
+cannot create Android process cgroups on the host's read-only cgroup mount. Set
+`AESL_APPLY_WAYDROID_PATCHES=true` only in a dedicated runtime-integration lane
+after the broader patch stack has been rebased and tested against the locked
+source manifest.
 
 ## Framework laptop test lane
 

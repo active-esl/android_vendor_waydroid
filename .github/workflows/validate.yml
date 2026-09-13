@@ -28,6 +28,7 @@ jobs:
               "system/core/0002-waydroid-init-modify-mount_all-to-skip-mounts-and-tr.patch",
               "system/core/0004-libsync-Add-sw_sync-symbols-to-map.patch",
               "system/core/0005-init-Define-host-user.patch",
+              "system/core/0008-Revert-init-Treat-failure-to-create-a-process-group-.patch",
           ]
           positions = [build.find(patch) for patch in required]
           if -1 in positions:

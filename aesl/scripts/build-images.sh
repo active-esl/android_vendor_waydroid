@@ -268,7 +268,10 @@ apply_checked_patch \
 # The Waydroid vendor init services use its dynamic `host` UID. Android 13's
 # init verifier shares DecodeUid with init itself, so these minimal upstream
 # system/core patches are also required for a valid image and verification of
-# its vendor init script. Keep the rest of the framework/core stack opt-in.
+# its vendor init script. The LXC host exposes cgroups read-only, so Android
+# services must also tolerate createProcessGroup() failure instead of aborting
+# (apexd is reboot_on_failure and otherwise shuts the container down). Keep the
+# rest of the framework/core stack opt-in.
 apply_checked_patch \
     system/core \
     "${repo_root}/waydroid-patches/base-patches-33/system/core/0004-libsync-Add-sw_sync-symbols-to-map.patch" \
@@ -277,6 +280,10 @@ apply_checked_patch \
     system/core \
     "${repo_root}/waydroid-patches/base-patches-33/system/core/0005-init-Define-host-user.patch" \
     "Waydroid init host UID"
+apply_checked_patch \
+    system/core \
+    "${repo_root}/waydroid-patches/base-patches-33/system/core/0008-Revert-init-Treat-failure-to-create-a-process-group-.patch" \
+    "Waydroid non-fatal process cgroups"
 apply_checked_patch \
     lineage-sdk \
     "${repo_root}/waydroid-patches/base-patches-33/lineage-sdk/0001-sdk-Introduce-WayDroid-Service.patch" \

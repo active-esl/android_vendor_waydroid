@@ -18,6 +18,15 @@ authoritative.
   Waydroid framework/runtime patch stack opt-in. The original board images were
   restored after the failed trial; the failed pair and build evidence remain
   on the board for comparison.
+- Retest: CI build `a9c4291` passed first-stage init, started Android services,
+  then `createProcessGroup()` failed against the LXC host's read-only cgroup
+  mount. All affected services aborted; `apexd` has `reboot_on_failure`, so init
+  shut the container down before Binder servicemanager appeared.
+- Follow-up fix: promote upstream system/core patch `0008`, which retains the
+  process-group error as evidence but no longer treats it as fatal. Keep the
+  remainder of the broad framework/runtime patch stack opt-in. The board was
+  restored byte-for-byte to its original image pair after the failed retest and
+  Android again reached `sys.boot_completed=1`.
 
 ## 2026-09-04 — First i.MX8M Mini hardware pass
 
