@@ -21,13 +21,13 @@ removes the stock launcher, updater and unused consumer applications. The
 Active ESL kiosk controller remains the sole HOME activity. The Linux host
 provides lz4 zram; verify that independently during hardware acceptance.
 
-The normal image workflow does not apply Waydroid's framework/core patch stack:
-it produces the locked vanilla LineageOS system image paired with the Waydroid
-vendor image. The sole exception is the upstream init host-UID decoder patch;
-the Waydroid vendor init services require it and Android's init verifier uses
-the same decoder. Set `AESL_APPLY_WAYDROID_PATCHES=true` only in a dedicated
-runtime-integration lane after that broader patch stack has been rebased and
-tested against the locked source manifest.
+The normal image workflow does not apply Waydroid's broad framework/core patch
+stack: it produces the locked LineageOS system image paired with the Waydroid
+vendor image. It does apply the minimal upstream runtime compatibility needed
+to boot inside LXC: the ordered first-stage/mount-all init pair, the libsync ABI
+export and the dynamic host-UID decoder. Set `AESL_APPLY_WAYDROID_PATCHES=true`
+only in a dedicated runtime-integration lane after the broader patch stack has
+been rebased and tested against the locked source manifest.
 
 ## Framework laptop test lane
 

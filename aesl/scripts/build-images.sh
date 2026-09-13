@@ -252,18 +252,31 @@ apply_checked_patch \
     "${repo_root}/waydroid-patches/base-patches-33/external/wayland-protocols/0001-staging-Add-fractional-scale.patch" \
     "Waydroid fractional-scale protocol"
 
-# The Waydroid vendor init services use its dynamic `host` UID. Android 13's
-# init verifier shares DecodeUid with init itself, so this minimal upstream
-# system/core patch is required for both a valid image and verification of its
-# vendor init script. Keep the rest of Waydroid's framework/core stack opt-in.
+# Android first-stage init normally owns /dev, /proc, /sys and selinuxfs. In
+# Waydroid those filesystems are supplied by the LXC host; trying to mount
+# selinuxfs aborts first-stage init before servicemanager can start. Apply the
+# ordered upstream container-init pair before the narrower ABI/UID fixes.
 apply_checked_patch \
     system/core \
-    "${repo_root}/waydroid-patches/base-patches-33/system/core/0005-init-Define-host-user.patch" \
-    "Waydroid init host UID"
+    "${repo_root}/waydroid-patches/base-patches-33/system/core/0001-waydroid-init-start-inside-LXC-container-without-SEL.patch" \
+    "Waydroid LXC first-stage init"
+apply_checked_patch \
+    system/core \
+    "${repo_root}/waydroid-patches/base-patches-33/system/core/0002-waydroid-init-modify-mount_all-to-skip-mounts-and-tr.patch" \
+    "Waydroid LXC mount_all"
+
+# The Waydroid vendor init services use its dynamic `host` UID. Android 13's
+# init verifier shares DecodeUid with init itself, so these minimal upstream
+# system/core patches are also required for a valid image and verification of
+# its vendor init script. Keep the rest of the framework/core stack opt-in.
 apply_checked_patch \
     system/core \
     "${repo_root}/waydroid-patches/base-patches-33/system/core/0004-libsync-Add-sw_sync-symbols-to-map.patch" \
     "Waydroid libsync ABI"
+apply_checked_patch \
+    system/core \
+    "${repo_root}/waydroid-patches/base-patches-33/system/core/0005-init-Define-host-user.patch" \
+    "Waydroid init host UID"
 apply_checked_patch \
     lineage-sdk \
     "${repo_root}/waydroid-patches/base-patches-33/lineage-sdk/0001-sdk-Introduce-WayDroid-Service.patch" \

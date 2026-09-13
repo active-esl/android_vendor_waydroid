@@ -17,6 +17,25 @@ jobs:
         run: bash -n aesl/scripts/*.sh
       - name: Validate Python
         run: python3 -m py_compile aesl/scripts/write-build-info.py
+      - name: Check mandatory Waydroid LXC init patches
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          build = Path("aesl/scripts/build-images.sh").read_text()
+          required = [
+              "system/core/0001-waydroid-init-start-inside-LXC-container-without-SEL.patch",
+              "system/core/0002-waydroid-init-modify-mount_all-to-skip-mounts-and-tr.patch",
+              "system/core/0004-libsync-Add-sw_sync-symbols-to-map.patch",
+              "system/core/0005-init-Define-host-user.patch",
+          ]
+          positions = [build.find(patch) for patch in required]
+          if -1 in positions:
+              missing = [patch for patch, position in zip(required, positions) if position < 0]
+              raise SystemExit(f"missing mandatory Waydroid patch(es): {missing}")
+          if positions != sorted(positions):
+              raise SystemExit("mandatory Waydroid system/core patches are out of order")
+          PY
       - name: Check source-lock policy
         run: |
           python3 - <<'PY'

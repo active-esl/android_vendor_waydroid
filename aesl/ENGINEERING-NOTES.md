@@ -4,6 +4,21 @@ This is a concise, non-confidential record of decisions and proof points. It is
 not release evidence; immutable manifests, CI artifacts and hardware logs remain
 authoritative.
 
+## 2026-09-13 — Jaguar LXC first-stage boot failure
+
+- Hardware trial of CI build `6f74710` on the 2 GB i.MX8MM Jaguar screen
+  mounted both images successfully, then exited before Binder servicemanager.
+- Host kernel evidence showed Android first-stage init aborting after its
+  `selinuxfs` mount failed inside the unprivileged LXC container.
+- Root cause: the reproducible lane applied the host-UID and libsync patches
+  but omitted Waydroid's ordered `system/core` patches `0001` and `0002`, which
+  hand `/dev`, `/proc`, `/sys`, SELinux setup and later filesystem mounts to the
+  container host.
+- Fix: make that minimal ordered init pair mandatory while keeping the broader
+  Waydroid framework/runtime patch stack opt-in. The original board images were
+  restored after the failed trial; the failed pair and build evidence remain
+  on the board for comparison.
+
 ## 2026-09-04 — First i.MX8M Mini hardware pass
 
 - Decision: use the upstream Etnaviv DRM driver for Waydroid rather than the
