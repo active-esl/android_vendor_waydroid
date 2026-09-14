@@ -1,4 +1,5 @@
-name: Resolve Android source lock
+name: Resolve Android R13 / LineageOS 20 source lock
+run-name: Resolve Android R13 / LineageOS 20 source lock - ${{ github.ref_name }}
 
 on:
   workflow_dispatch:
@@ -8,6 +9,7 @@ permissions:
 
 jobs:
   resolve:
+    name: Android R13 / LineageOS 20 source lock
     runs-on: [self-hosted, Linux, esl-proxmox]
     timeout-minutes: 360
     steps:
@@ -22,6 +24,6 @@ jobs:
         run: aesl/scripts/resolve-lock.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: lineage-20-source-lock-${{ github.sha }}
+          name: android-r13-lineage-20-source-lock-${{ github.sha }}
           path: source-manifest.xml
           if-no-files-found: error

@@ -1,4 +1,5 @@
-name: Build AESL Waydroid images
+name: Build Android R13 / LineageOS 20 Waydroid images
+run-name: Android R13 / LineageOS 20 - ARM64 - ${{ github.ref_name }}
 
 on:
   workflow_dispatch:
@@ -14,13 +15,14 @@ concurrency:
 
 jobs:
   build:
+    name: Android R13 / LineageOS 20 - ARM64
     runs-on: [self-hosted, Linux, esl-proxmox]
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v7
       - name: Install checksum-pinned repo launcher
         run: aesl/scripts/install-repo-tool.sh
-      - name: Build locked Waydroid ARM64 images
+      - name: Build Android R13 / LineageOS 20 ARM64 images
         env:
           ANDROID_WORKSPACE: /yocto/actions-runner-cache/aesl-android-source
           OUTPUT_DIR: ${{ github.workspace }}/out-aesl
@@ -30,7 +32,7 @@ jobs:
           # ref_name may contain '/', which upload-artifact rejects.  The run
           # ID is filesystem-safe and still gives every build a stable,
           # traceable artifact name.
-          name: aesl-waydroid-arm64-${{ github.run_id }}
+          name: aesl-android-r13-lineage-20-arm64-${{ github.run_id }}
           path: out-aesl/
           if-no-files-found: error
           retention-days: 30

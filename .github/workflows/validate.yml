@@ -16,7 +16,9 @@ jobs:
       - name: Validate shell
         run: bash -n aesl/scripts/*.sh
       - name: Validate Python
-        run: python3 -m py_compile aesl/scripts/write-build-info.py
+        run: python3 -m py_compile aesl/scripts/write-build-info.py aesl/scripts/test-ci-release-labels.py
+      - name: Check Android release labels
+        run: python3 aesl/scripts/test-ci-release-labels.py
       - name: Check source-lock policy
         run: |
           python3 - <<'PY'

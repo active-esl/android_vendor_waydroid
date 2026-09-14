@@ -21,7 +21,7 @@ through `AESL_APPLY_WAYDROID_PATCHES=true` only in a dedicated rebase lane.
 
 ## Framework laptop test lane
 
-The **Build AESL Waydroid x86_64 test images** workflow builds
+The **Build Android R13 / LineageOS 20 x86_64 test images** workflow builds
 `lineage_waydroid_x86_64-userdebug` from the same reviewed source lock. It
 uses a separate Android workspace and artifact name so it can be installed in
 Waydroid on an x86_64 Linux Framework laptop without affecting the ARM64
