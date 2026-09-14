@@ -35,8 +35,8 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/waydroid.prop:$(TARGET_COPY_OUT_VENDOR)/waydroid.prop
 
 # Active ESL product-owned vendor configuration. Keep this limited to vendor
-# content so the locked LineageOS system image remains a separately reusable
-# vanilla artifact.
+# content so the locked LineageOS system image remains reusable independently
+# of product-specific policy.
 AESL_VENDOR_OVERLAY_PATH := $(LOCAL_PATH)/aesl/overlays/vendor
 include $(LOCAL_PATH)/aesl/overlays/vendor/aesl-vendor.mk
 

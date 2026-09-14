@@ -5,7 +5,7 @@ This is the Active ESL fork of
 It retains upstream history and adds the controlled build and release machinery
 under [`aesl/`](aesl/README.md).
 
-The initial product target is a Vanilla LineageOS 20 (Android 13) ARM64 system
+The initial product target is a Waydroid-patched LineageOS 20 (Android 13) ARM64 system
 image paired with the Mesa-enabled Mainline vendor image for Waydroid on the
 i.MX8M Mini Jaguar Screen.
 

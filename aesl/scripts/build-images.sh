@@ -194,10 +194,9 @@ apply_checked_patch() {
     fi
 }
 
-# Mesa 26 is built with Waydroid's pinned host helpers.  This upstream,
+# Mesa 26 is built with Waydroid's pinned host helpers. This upstream,
 # build-tools-only patch exposes the already locked prebuilts/mesa-tools
-# binaries to the Android build PATH.  It does not alter the vanilla Android
-# framework/core source lane.
+# binaries to the Android build PATH.
 apply_checked_patch \
     prebuilts/build-tools \
     "${repo_root}/waydroid-patches/base-patches-33/prebuilts/build-tools/0001-Add-prebuilt-mesa-tools-to-PATH.patch" \
@@ -252,11 +251,10 @@ apply_checked_patch \
 set +u
 source build/envsetup.sh
 
-# This CI lane proves the reproducible vanilla LineageOS system image and the
-# paired Waydroid vendor image.  The upstream patch stack changes framework and
-# core Android sources; it is intentionally opt-in until it has been rebased
-# and runtime-tested against this exact source lock.
-if [[ "${AESL_APPLY_WAYDROID_PATCHES:-false}" == "true" ]]; then
+# The published images run under LXC, so the reviewed Waydroid container
+# compatibility stack is part of the production image. Keep an explicit
+# opt-out for reproducibility comparisons only.
+if [[ "${AESL_APPLY_WAYDROID_PATCHES:-true}" == "true" ]]; then
     apply-waydroid-patches
 fi
 export TARGET_USE_MESA=true
