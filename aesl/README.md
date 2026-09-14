@@ -4,7 +4,7 @@
 
 The pipeline produces:
 
-- `system.img` — Vanilla LineageOS 20 ARM64;
+- `system.img` — Waydroid-patched LineageOS 20 ARM64;
 - `vendor.img` — Waydroid Mainline vendor with Mesa enabled;
 - `SHA256SUMS`;
 - `source-manifest.xml` containing immutable revisions;
@@ -13,13 +13,11 @@ The pipeline produces:
 Google applications are deliberately excluded. Signing and release publication
 are separate protected stages; development images are not production releases.
 
-The normal image workflow does not apply Waydroid's framework/core patch stack:
-it produces the locked vanilla LineageOS system image paired with the Waydroid
-vendor image. The sole exception is the upstream init host-UID decoder patch;
-the Waydroid vendor init services require it and Android's init verifier uses
-the same decoder. Set `AESL_APPLY_WAYDROID_PATCHES=true` only in a dedicated
-runtime-integration lane after that broader patch stack has been rebased and
-tested against the locked source manifest.
+The normal image workflow applies the reviewed container-critical patches,
+including Waydroid's Android init adaptation, and produces the locked
+container-compatible LineageOS system image paired with the Waydroid vendor
+image. The wider optional desktop-integration patch stack remains available
+through `AESL_APPLY_WAYDROID_PATCHES=true` only in a dedicated rebase lane.
 
 ## Framework laptop test lane
 

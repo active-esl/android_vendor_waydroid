@@ -52,7 +52,6 @@ require_command ninja
 require_command glslangValidator
 require_command bison
 require_command flex
-require_command ccache
 
 # Mesa's generated sources use these modules through the runner's host Python.
 # Check them up front instead of discovering missing modules during Meson setup.
@@ -103,15 +102,19 @@ output_dir="${OUTPUT_DIR:-${repo_root}/out-aesl}"
 echo "AESL CI: preparing workspace at ${android_dir}"
 mkdir -p "${android_dir}" "${output_dir}"
 
-# Persist compiler results independently of a target's out/ tree. A source
-# lock change still invalidates affected entries, while repeated ARM64/x86_64
-# image builds avoid recompiling identical host/tool sources. Keep the cache
-# below the runner cache, not in a Git checkout or an uploaded artifact.
-export USE_CCACHE=1
-export CCACHE_DIR="${CCACHE_DIR:-/yocto/actions-runner-cache/aesl-android-ccache}"
-export CCACHE_MAXSIZE="${CCACHE_MAXSIZE:-100G}"
-export CCACHE_COMPRESS="${CCACHE_COMPRESS:-true}"
-mkdir -p "${CCACHE_DIR}"
+# Keep the baseline compiler flags by default so incremental image builds can
+# reuse their native outputs. USE_CCACHE changes Soong's global flags even when
+# CCACHE_EXEC is missing, causing a full rebuild without actually caching it.
+# Enabling ccache is an explicit opt-in because it changes compiler commands.
+export USE_CCACHE="${USE_CCACHE:-false}"
+if [[ "${USE_CCACHE}" == "true" || "${USE_CCACHE}" == "1" ]]; then
+    export CCACHE_EXEC="${CCACHE_EXEC:-$(command -v ccache)}"
+    [[ -x "${CCACHE_EXEC}" ]] || die "CCACHE_EXEC must name an executable ccache"
+    export CCACHE_DIR="${CCACHE_DIR:-/yocto/actions-runner-cache/aesl-android-ccache}"
+    export CCACHE_MAXSIZE="${CCACHE_MAXSIZE:-100G}"
+    export CCACHE_COMPRESS="${CCACHE_COMPRESS:-true}"
+    mkdir -p "${CCACHE_DIR}"
+fi
 
 # CT101 has 12 vCPUs and 40 GiB RAM. Ten compile jobs retain memory headroom
 # while using the available CPU more effectively than the former hard-coded 8.
@@ -194,10 +197,9 @@ apply_checked_patch() {
     fi
 }
 
-# Mesa 26 is built with Waydroid's pinned host helpers.  This upstream,
+# Mesa 26 is built with Waydroid's pinned host helpers. This upstream,
 # build-tools-only patch exposes the already locked prebuilts/mesa-tools
-# binaries to the Android build PATH.  It does not alter the vanilla Android
-# framework/core source lane.
+# binaries to the Android build PATH.
 apply_checked_patch \
     prebuilts/build-tools \
     "${repo_root}/waydroid-patches/base-patches-33/prebuilts/build-tools/0001-Add-prebuilt-mesa-tools-to-PATH.patch" \
@@ -225,10 +227,14 @@ apply_checked_patch \
     "${repo_root}/waydroid-patches/base-patches-33/external/wayland-protocols/0001-staging-Add-fractional-scale.patch" \
     "Waydroid fractional-scale protocol"
 
-# The Waydroid vendor init services use its dynamic `host` UID. Android 13's
-# init verifier shares DecodeUid with init itself, so this minimal upstream
-# system/core patch is required for both a valid image and verification of its
-# vendor init script. Keep the rest of Waydroid's framework/core stack opt-in.
+# Android init normally mounts physical-device filesystems and performs its
+# own SELinux transition. In an LXC guest those mounts are already owned by the
+# host, so apply Waydroid's reviewed container-init adaptation before the
+# smaller init/libsync compatibility patches.
+apply_checked_patch \
+    system/core \
+    "${repo_root}/waydroid-patches/base-patches-33/system/core/0001-waydroid-init-start-inside-LXC-container-without-SEL.patch" \
+    "Waydroid container init"
 apply_checked_patch \
     system/core \
     "${repo_root}/waydroid-patches/base-patches-33/system/core/0005-init-Define-host-user.patch" \
@@ -252,10 +258,10 @@ apply_checked_patch \
 set +u
 source build/envsetup.sh
 
-# This CI lane proves the reproducible vanilla LineageOS system image and the
-# paired Waydroid vendor image.  The upstream patch stack changes framework and
-# core Android sources; it is intentionally opt-in until it has been rebased
-# and runtime-tested against this exact source lock.
+# The bulk upstream patch helper covers optional desktop integration across
+# dozens of Android projects. It is not part of the locked baseline and may be
+# enabled only in a dedicated rebase lane; the required container-init changes
+# above are always applied to published images.
 if [[ "${AESL_APPLY_WAYDROID_PATCHES:-false}" == "true" ]]; then
     apply-waydroid-patches
 fi
