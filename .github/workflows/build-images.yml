@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install checksum-pinned repo launcher
         run: aesl/scripts/install-repo-tool.sh
-      - name: Build locked Vanilla ARM64 images
+      - name: Build locked Waydroid ARM64 images
         env:
           ANDROID_WORKSPACE: /yocto/actions-runner-cache/aesl-android-source
           OUTPUT_DIR: ${{ github.workspace }}/out-aesl

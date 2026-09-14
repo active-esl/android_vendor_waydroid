@@ -1,7 +1,7 @@
 # Active ESL vendor overlay for the Waydroid image.
 #
 # Put device/runtime-specific configuration here. Framework compatibility
-# remains in the reviewed Waydroid patch stack, not in the vendor overlay.
+# remains in the reviewed container patch set, not in the vendor overlay.
 
 PRODUCT_COPY_FILES += \
     $(AESL_VENDOR_OVERLAY_PATH)/etc/aesl/defaults.conf:$(TARGET_COPY_OUT_VENDOR)/etc/aesl/defaults.conf

@@ -224,10 +224,14 @@ apply_checked_patch \
     "${repo_root}/waydroid-patches/base-patches-33/external/wayland-protocols/0001-staging-Add-fractional-scale.patch" \
     "Waydroid fractional-scale protocol"
 
-# The Waydroid vendor init services use its dynamic `host` UID. Android 13's
-# init verifier shares DecodeUid with init itself, so this minimal upstream
-# system/core patch is required for both a valid image and verification of its
-# vendor init script. Keep the rest of Waydroid's framework/core stack opt-in.
+# Android init normally mounts physical-device filesystems and performs its
+# own SELinux transition. In an LXC guest those mounts are already owned by the
+# host, so apply Waydroid's reviewed container-init adaptation before the
+# smaller init/libsync compatibility patches.
+apply_checked_patch \
+    system/core \
+    "${repo_root}/waydroid-patches/base-patches-33/system/core/0001-waydroid-init-start-inside-LXC-container-without-SEL.patch" \
+    "Waydroid container init"
 apply_checked_patch \
     system/core \
     "${repo_root}/waydroid-patches/base-patches-33/system/core/0005-init-Define-host-user.patch" \
@@ -251,10 +255,11 @@ apply_checked_patch \
 set +u
 source build/envsetup.sh
 
-# The published images run under LXC, so the reviewed Waydroid container
-# compatibility stack is part of the production image. Keep an explicit
-# opt-out for reproducibility comparisons only.
-if [[ "${AESL_APPLY_WAYDROID_PATCHES:-true}" == "true" ]]; then
+# The bulk upstream patch helper covers optional desktop integration across
+# dozens of Android projects. It is not part of the locked baseline and may be
+# enabled only in a dedicated rebase lane; the required container-init changes
+# above are always applied to published images.
+if [[ "${AESL_APPLY_WAYDROID_PATCHES:-false}" == "true" ]]; then
     apply-waydroid-patches
 fi
 export TARGET_USE_MESA=true

@@ -13,11 +13,11 @@ The pipeline produces:
 Google applications are deliberately excluded. Signing and release publication
 are separate protected stages; development images are not production releases.
 
-The normal image workflow applies the reviewed Waydroid framework/core patch
-stack and produces the locked container-compatible LineageOS system image
-paired with the Waydroid vendor image. Set
-`AESL_APPLY_WAYDROID_PATCHES=false` only for a reproducibility comparison that
-will not be published as a runnable Waydroid release.
+The normal image workflow applies the reviewed container-critical patches,
+including Waydroid's Android init adaptation, and produces the locked
+container-compatible LineageOS system image paired with the Waydroid vendor
+image. The wider optional desktop-integration patch stack remains available
+through `AESL_APPLY_WAYDROID_PATCHES=true` only in a dedicated rebase lane.
 
 ## Framework laptop test lane
 
