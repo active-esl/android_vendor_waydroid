@@ -10,6 +10,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--output", required=True)
 parser.add_argument("--source-lock", required=True)
 parser.add_argument("--target", required=True)
+parser.add_argument("--android-release", choices=("r13",), required=True)
+parser.add_argument("--lineage-release", choices=("20",), required=True)
+parser.add_argument("--memory-profile", choices=("standard", "2gb"), required=True)
 args = parser.parse_args()
 
 lock = Path(args.source_lock)
@@ -22,6 +25,10 @@ generated = datetime.datetime.fromtimestamp(
 document = {
     "schema": 1,
     "owner": "Active ESL",
+    "android_release": args.android_release,
+    "lineage_release": args.lineage_release,
+    "memory_profile": args.memory_profile,
+    "maintenance_class": "legacy-customer-qualification",
     "target": args.target,
     "source_lock_sha256": hashlib.sha256(lock.read_bytes()).hexdigest(),
     "source_date_epoch": source_date_epoch,

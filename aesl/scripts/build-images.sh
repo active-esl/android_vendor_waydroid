@@ -101,6 +101,15 @@ android_dir="${ANDROID_WORKSPACE:-${repo_root}/.android-workspace}"
 output_dir="${OUTPUT_DIR:-${repo_root}/out-aesl}"
 echo "AESL CI: preparing workspace at ${android_dir}"
 mkdir -p "${android_dir}" "${output_dir}"
+out_dir="${ANDROID_OUT_DIR:-${android_dir}/out-${AESL_MEMORY_PROFILE}}"
+case "${out_dir}" in
+    "${android_dir}"/*) ;;
+    *) die "ANDROID_OUT_DIR must be inside ANDROID_WORKSPACE" ;;
+esac
+mkdir -p "${out_dir}"
+# Keep standard and 2 GB generated output independent while sharing the pinned
+# source checkout and object cache.
+export OUT_DIR="${out_dir#"${android_dir}"/}"
 
 # Keep the baseline compiler flags by default so incremental image builds can
 # reuse their native outputs. USE_CCACHE changes Soong's global flags even when
@@ -267,23 +276,38 @@ if [[ "${AESL_APPLY_WAYDROID_PATCHES:-false}" == "true" ]]; then
 fi
 export TARGET_USE_MESA=true
 lunch "${AESL_LUNCH_TARGET}"
-run_with_heartbeat "Android system and vendor image build" \
-    m -j"${build_jobs}" systemimage vendorimage
+run_with_heartbeat "Android system, vendor and SPDX image build" \
+    m -j"${build_jobs}" systemimage vendorimage sbom
 
 install -m 0644 "${OUT}/system.img" "${output_dir}/system.img"
 install -m 0644 "${OUT}/vendor.img" "${output_dir}/vendor.img"
 cp "${lock_file}" "${output_dir}/source-manifest.xml"
-(
-    cd "${output_dir}"
-    sha256sum system.img vendor.img source-manifest.xml > SHA256SUMS
-)
+
+sbom_dir="${out_dir}/soong/sbom/${TARGET_PRODUCT:?TARGET_PRODUCT is not set}"
+[[ -s "${sbom_dir}/sbom.spdx.json" ]] \
+    || die "Android SPDX JSON SBOM was not generated for ${AESL_LUNCH_TARGET}"
+python3 -m json.tool "${sbom_dir}/sbom.spdx.json" >/dev/null
+install -m 0644 "${sbom_dir}/sbom.spdx.json" "${output_dir}/sbom.spdx.json"
+for partition in system vendor; do
+    notice="${OUT}/${partition}/etc/NOTICE.xml.gz"
+    [[ -s "${notice}" ]] || die "Android ${partition} NOTICE archive was not generated"
+    install -m 0644 "${notice}" "${output_dir}/NOTICE-${partition}.xml.gz"
+done
 
 python3 "${script_dir}/write-build-info.py" \
     --output "${output_dir}/build-info.json" \
     --source-lock "${output_dir}/source-manifest.xml" \
-    --target "${AESL_LUNCH_TARGET}"
+    --target "${AESL_LUNCH_TARGET}" \
+    --android-release r13 \
+    --lineage-release 20 \
+    --memory-profile "${AESL_MEMORY_PROFILE}"
 
 # Preserve Android's generated licence/provenance inputs where available.
 find "${OUT}" -maxdepth 2 -type f \
     \( -name '*license*' -o -name 'installed-files*.txt' \) \
     -exec cp -t "${output_dir}" {} + 2>/dev/null || true
+
+(
+    cd "${output_dir}"
+    find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
+)

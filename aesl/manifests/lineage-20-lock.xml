@@ -332,7 +332,7 @@
   <project name="LineageOS/mirror" path="lineage/mirror" revision="e8addfe7ca38ce1da1a427413a7317a01a2048a6" upstream="main" dest-branch="main" groups="infra" />
   <project name="LineageOS/scripts" path="lineage/scripts" revision="84a3bb946047eff566e13882289bcf791a94cfa7" upstream="main" dest-branch="main" groups="tools" />
   <project name="LineageOS/www" path="lineage/website" revision="cae5e9e3b212568716b865d7d532da72cb24c23b" upstream="main" dest-branch="main" groups="infra" />
-  <project name="WayDroid/android_device_waydroid_waydroid" path="device/waydroid/waydroid" remote="ghub" revision="2234f4b75220be7065546a2a23f9a4091b8c77d4" upstream="refs/heads/lineage-20" dest-branch="refs/heads/lineage-20" groups="local::02-waydroid" />
+  <project name="active-esl/android_device_waydroid_waydroid" path="device/waydroid/waydroid" remote="ghub" revision="0f9fe258217d512bd94aeb93daa76066b2a85871" upstream="refs/heads/feature/r13-memory-profiles" dest-branch="refs/heads/lineage-20" groups="local::02-waydroid" />
   <project name="WayDroid/android_external_alsa-lib" path="external/alsa-lib" remote="ghub" revision="8a1eff33a2430b29ea2fc11f32a0a349e90c1c93" upstream="refs/heads/lineage-17.1" dest-branch="refs/heads/lineage-17.1" groups="local::02-waydroid" />
   <project name="WayDroid/android_external_alsa-plugins" path="external/alsa-plugins" remote="ghub" revision="fcc0a2c3002ab0e68694896ded9c76dcd4cc1352" upstream="refs/heads/lineage-17.1" dest-branch="refs/heads/lineage-17.1" groups="local::02-waydroid" />
   <project name="WayDroid/android_external_libdrm" path="external/libdrm" remote="ghub" revision="6bfcfc725fbe0ece0918535556d61ee567b1ffff" upstream="refs/heads/lineage-18.1" dest-branch="refs/heads/lineage-18.1" groups="local::02-waydroid" />

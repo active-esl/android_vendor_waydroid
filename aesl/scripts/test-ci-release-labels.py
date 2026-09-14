@@ -22,7 +22,7 @@ def main() -> None:
             "name: Build Android R13 / LineageOS 20 Waydroid images",
             "run-name: Android R13 / LineageOS 20 - ARM64",
             "name: Android R13 / LineageOS 20 - ARM64",
-            "name: aesl-android-r13-lineage-20-arm64-${{ github.run_id }}",
+            "name: aesl-android-r13-lineage-20-arm64-${{ inputs.memory_profile || 'standard' }}",
         ),
     )
     require_labels(
@@ -42,6 +42,13 @@ def main() -> None:
             "name: android-r13-lineage-20-source-lock-${{ github.sha }}",
         ),
     )
+    common = (REPO_ROOT / "aesl/scripts/common.sh").read_text(encoding="utf-8")
+    for label in ("standard)", "2gb)", "lineage_waydroid_aesl_2gb_arm64_only-userdebug"):
+        assert label in common, f"missing Android R13 memory-profile mapping: {label}"
+
+    build = (REPO_ROOT / "aesl/scripts/build-images.sh").read_text(encoding="utf-8")
+    for evidence in ("sbom.spdx.json", 'NOTICE-${partition}.xml.gz'):
+        assert evidence in build, f"missing Android R13 release evidence: {evidence}"
     print("Android R13 CI release labels valid")
 
 

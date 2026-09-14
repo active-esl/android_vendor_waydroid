@@ -1,8 +1,17 @@
 name: Build Android R13 / LineageOS 20 Waydroid images
-run-name: Android R13 / LineageOS 20 - ARM64 - ${{ github.ref_name }}
+run-name: Android R13 / LineageOS 20 - ARM64 ${{ inputs.memory_profile || 'standard' }} - ${{ github.ref_name }}
 
 on:
   workflow_dispatch:
+    inputs:
+      memory_profile:
+        description: Maintained Android R13 ARM64 memory profile
+        required: true
+        default: standard
+        type: choice
+        options:
+          - standard
+          - 2gb
   push:
     tags: ['aesl-waydroid-v*']
 
@@ -15,15 +24,16 @@ concurrency:
 
 jobs:
   build:
-    name: Android R13 / LineageOS 20 - ARM64
+    name: Android R13 / LineageOS 20 - ARM64 ${{ inputs.memory_profile || 'standard' }}
     runs-on: [self-hosted, Linux, esl-proxmox]
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v7
       - name: Install checksum-pinned repo launcher
         run: aesl/scripts/install-repo-tool.sh
-      - name: Build Android R13 / LineageOS 20 ARM64 images
+      - name: Build Android R13 / LineageOS 20 ARM64 ${{ inputs.memory_profile || 'standard' }} images
         env:
+          AESL_MEMORY_PROFILE: ${{ inputs.memory_profile || 'standard' }}
           ANDROID_WORKSPACE: /yocto/actions-runner-cache/aesl-android-source
           OUTPUT_DIR: ${{ github.workspace }}/out-aesl
         run: aesl/scripts/build-images.sh
@@ -32,7 +42,7 @@ jobs:
           # ref_name may contain '/', which upload-artifact rejects.  The run
           # ID is filesystem-safe and still gives every build a stable,
           # traceable artifact name.
-          name: aesl-android-r13-lineage-20-arm64-${{ github.run_id }}
+          name: aesl-android-r13-lineage-20-arm64-${{ inputs.memory_profile || 'standard' }}-${{ github.run_id }}
           path: out-aesl/
           if-no-files-found: error
           retention-days: 30
