@@ -1,3 +1,4 @@
+From 646efb4addbb49d6b7ae2707bf200a761ea94db2 Mon Sep 17 00:00:00 2001
 From: Active ESL Android CI <engineering@active-esl.com>
 Date: Wed, 16 Sep 2026 00:00:00 +0000
 Subject: [PATCH] waydroid: disable multiple desktops backend for bp4a
@@ -7,13 +8,12 @@ multiple-desktops backend enabled, SystemUI tries to create a freeform desk
 root task on a fullscreen-only display and crashes. Disable the read-only
 release flag for every bp4a product, including the AESL i.MX8 and i.MX9
 targets, while retaining the pinned upstream source lock.
-
 ---
- .../enable_multiple_desktops_backend_flag_values.textproto           | 2 +-
+ .../enable_multiple_desktops_backend_flag_values.textproto      | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/aconfig/bp4a/com.android.window.flags/enable_multiple_desktops_backend_flag_values.textproto b/aconfig/bp4a/com.android.window.flags/enable_multiple_desktops_backend_flag_values.textproto
-index 4e22662384e7..000000000000 100644
+index 4e22662..1ca2f0b 100644
 --- a/aconfig/bp4a/com.android.window.flags/enable_multiple_desktops_backend_flag_values.textproto
 +++ b/aconfig/bp4a/com.android.window.flags/enable_multiple_desktops_backend_flag_values.textproto
 @@ -1,6 +1,6 @@
