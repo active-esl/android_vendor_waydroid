@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Active ESL Android CI <engineering@active-esl.com>
+Date: Fri, 18 Sep 2026 10:10:00 +0100
+Subject: [PATCH] vivante: Use pinned NXP libdrm include path
+
+The NXP libdrm-imx source is pinned at external/libdrm-android beside the
+Waydroid libdrm module. Point the Vivante module at its own headers in
+that checkout.
+
+---
+ vivante/Android.bp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/vivante/Android.bp b/vivante/Android.bp
+--- a/vivante/Android.bp
++++ b/vivante/Android.bp
+@@ -16,7 +16,7 @@ cc_library_shared {
+     name: "libdrm_vivante",
+     srcs: ["vivante_bo.c"],
+     cflags: ["-Wno-unused-parameter"],
+-    include_dirs: ["vendor/nxp-opensource/libdrm-imx/include/drm"],
++    include_dirs: ["external/libdrm-android/include/drm"],
+     shared_libs: ["libdrm_android"],
+     vendor: true,
+ }
+-- 
+2.43.0
