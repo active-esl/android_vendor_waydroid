@@ -28,4 +28,4 @@ diff --git a/codec2/store/ImxC2Store.cpp b/codec2/store/ImxC2Store.cpp
 +#endif
      }
      close(ionFd);
-}
+ }
