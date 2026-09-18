@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Active ESL Android CI <engineering@active-esl.com>
+Date: Fri, 18 Sep 2026 15:20:00 +0100
+Subject: [PATCH] imx_android_mm: Guard legacy ION unmapped heap lookup
+
+The NXP legacy ION UAPI assigns heap type 5 to UNMAPPED, while the
+Android 16 libion header calls that enum value CUSTOM and does not
+declare UNMAPPED. This lookup is only used with pre-5.10 kernels;
+newer kernels use DMA heaps. Keep the legacy heap selection without
+depending on an enum name absent from the pinned Android headers.
+
+---
+diff --git a/codec2/store/ImxC2Store.cpp b/codec2/store/ImxC2Store.cpp
+--- a/codec2/store/ImxC2Store.cpp
++++ b/codec2/store/ImxC2Store.cpp
+@@ -756,10 +756,14 @@ static void initIonHeaps() {
+             gNonSecureHeaps |= 1 << ihd[i].heap_id;
+             continue;
+         }
+-        if (ihd[i].type == ION_HEAP_TYPE_UNMAPPED) {
++#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 10, 1)
++        // NXP's legacy ION UAPI calls type 5 UNMAPPED; the Android
++        // libion header calls the same value CUSTOM.
++        if (ihd[i].type == ION_HEAP_TYPE_CUSTOM) {
+             gSecureHeaps = 1 << ihd[i].heap_id;  // we have only one secure heap
+             continue;
+         }
++#endif
+     }
+     close(ionFd);
+}
