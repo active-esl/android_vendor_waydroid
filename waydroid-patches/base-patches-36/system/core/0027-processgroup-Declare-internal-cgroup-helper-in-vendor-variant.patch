@@ -1,0 +1,31 @@
+From e46d7f1a1481d9724af589afc8bfbe8ed99419ee Mon Sep 17 00:00:00 2001
+From: Active ESL Android CI <engineering@active-esl.com>
+Date: Fri, 18 Sep 2026 18:09:13 +0100
+Subject: [PATCH] processgroup: Declare internal cgroup helper in vendor
+ variant
+
+The Waydroid cgroup v2 patch calls createProcessGroup from task_profiles.cpp. Android 16 hides its declaration from VNDK clients, while the vendor variant of libprocessgroup still compiles the definition. Declare it locally only for that variant.
+---
+ libprocessgroup/task_profiles.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/libprocessgroup/task_profiles.cpp b/libprocessgroup/task_profiles.cpp
+index 5cf1cdc..86dff50 100644
+--- a/libprocessgroup/task_profiles.cpp
++++ b/libprocessgroup/task_profiles.cpp
+@@ -21,6 +21,12 @@
+ 
+ #include <processgroup/processgroup.h>
+ 
++#ifdef __ANDROID_VNDK__
++// This file is part of libprocessgroup in the vendor variant. The public
++// header hides this function from VNDK clients, but the library defines it.
++int createProcessGroup(uid_t uid, pid_t initialPid, bool memControl);
++#endif
++
+ #include <filesystem>
+ #include <map>
+ #include <string>
+-- 
+2.43.0
+
