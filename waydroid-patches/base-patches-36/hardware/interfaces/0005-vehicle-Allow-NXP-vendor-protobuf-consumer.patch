@@ -4,7 +4,9 @@ Date: Fri, 18 Sep 2026 09:45:00 +0100
 Subject: [PATCH] vehicle: Allow NXP vendor HAL to use vehicle protobuf
 
 NXP's Android 16 vehicle implementation links the existing vehicle 2.0
-protobuf library. Grant visibility only to that NXP vehicle subtree.
+protobuf library. Soong permits a module outside //vendor to grant access
+to vendor consumers only through //vendor:__subpackages__. Match the NXP
+Android 16 hardware-interfaces source's visibility rule.
 
 ---
  automotive/vehicle/proto/Android.bp | 1 +
@@ -17,7 +19,7 @@ diff --git a/automotive/vehicle/proto/Android.bp b/automotive/vehicle/proto/Andr
          "//hardware/interfaces/automotive/vehicle:__subpackages__",
          "//device/generic/car/emulator:__subpackages__",
          "//system/software_defined_vehicle/core_services:__subpackages__",
-+        "//vendor/nxp-opensource/imx/vehicle:__subpackages__",
++        "//vendor:__subpackages__",
      ],
      vendor: true,
      host_supported: true,
