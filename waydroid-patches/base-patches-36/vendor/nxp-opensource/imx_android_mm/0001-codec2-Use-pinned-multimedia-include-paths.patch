@@ -1,0 +1,57 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Active ESL Android CI <engineering@active-esl.com>
+Date: Fri, 18 Sep 2026 12:00:00 +0100
+Subject: [PATCH] imx_android_mm: Use pinned multimedia include paths
+
+The FRDM source lock places NXP libdrm at external/libdrm-android.
+The separately staged private Mali package has no top-level include
+folder. Remove unresolved include directories from the Codec2 build
+rules, including the disabled G2D test's obsolete source path.
+
+---
+diff --git a/codec2/Android.bp b/codec2/Android.bp
+--- a/codec2/Android.bp
++++ b/codec2/Android.bp
+@@ -190,7 +190,6 @@
+     include_dirs: [
+         "vendor/nxp-opensource/imx_android_mm/codec2/include",
+         "vendor/nxp-opensource/imx_android_mm/codec2/base/include",
+-        "vendor/nxp/fsl-proprietary/include",
+         "vendor/nxp-opensource/imx/include",
+         "vendor/nxp-opensource/imx/display/gralloc",
+     ],
+
+diff --git a/codec2/base/Android.bp b/codec2/base/Android.bp
+--- a/codec2/base/Android.bp
++++ b/codec2/base/Android.bp
+@@ -13,9 +13,8 @@
+         "vendor/nxp-opensource/imx/display/gralloc",
+         "vendor/nxp-opensource/imx_android_mm/extractor",
+         "system/core/include/system",
+-        "vendor/nxp/fsl-proprietary/include",
+-        "vendor/nxp-opensource/libdrm-imx",
+-        "vendor/nxp-opensource/libdrm-imx/include/drm",
++        "external/libdrm-android",
++        "external/libdrm-android/include/drm",
+         "device/nxp/common/kernel-headers",
+         "system/memory/libdmabufheap/include",
+         "frameworks/av/media/codec2/vndk/internal",
+
+diff --git a/codec2/test/g2d/Android.bp b/codec2/test/g2d/Android.bp
+--- a/codec2/test/g2d/Android.bp
++++ b/codec2/test/g2d/Android.bp
+@@ -24,12 +24,10 @@
+         "libcodec2_hidl_plugin_headers",
+     ],
+     include_dirs: [
+-        "vendor/nxp/fsl-proprietary/include",
+         "vendor/nxp-opensource/imx/include",
+         "vendor/nxp-opensource/imx/display/gralloc",
+         "vendor/nxp-opensource/imx_android_mm/codec2/include",
+         "vendor/nxp-opensource/imx_android_mm/codec2/base/include",
+-        "vendor/nxp-opensource/imx_android_mm/codec2/filter/g2d",
+     ],
+ 
+     cflags: [
+-- 
+2.43.0
