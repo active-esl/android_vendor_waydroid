@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Active ESL Android CI <engineering@active-esl.com>
+Date: Fri, 18 Sep 2026 12:30:00 +0100
+Subject: [PATCH] camera: Honor VPU-only board configuration
+
+A VPU-only Waydroid product has no NXP camera HAL inputs. Keep camera
+modules disabled for that configuration while preserving them for NXP
+boards that enable the full camera stack.
+
+---
+diff --git a/camera/camera.go b/camera/camera.go
+--- a/camera/camera.go
++++ b/camera/camera.go
+@@ -50,7 +50,7 @@
+ 
+ 	p := &props{}
+ 	var board string = ctx.Config().VendorConfig("IMXPLUGIN").String("BOARD_PLATFORM")
+-	if strings.Contains(board, "imx") {
++	if strings.Contains(board, "imx") && !ctx.Config().VendorConfig("IMXPLUGIN").Bool("BOARD_VPU_ONLY") {
+ 		p.Target.Android.Enabled = proptools.BoolPtr(true)
+ 	} else {
+ 		p.Target.Android.Enabled = proptools.BoolPtr(false)
+-- 
+2.43.0
