@@ -1,0 +1,133 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Active ESL Android CI <engineering@active-esl.com>
+Date: Fri, 18 Sep 2026 11:00:00 +0100
+Subject: [PATCH] imx: Use pinned libdrm header paths
+
+The FRDM source lock places NXP libdrm at external/libdrm-android.
+The separately staged private Mali package has no top-level include
+folder. Remove that unresolved path and point the NXP modules at the
+pinned libdrm headers so Soong can resolve their source paths.
+
+---
+diff --git a/camera/Android.bp b/camera/Android.bp
+--- a/camera/Android.bp
++++ b/camera/Android.bp
+@@ -66,10 +66,9 @@
+         "vendor/nxp-opensource/imx/include",
+         "vendor/nxp-opensource/imx/opencl-2d",
+         "vendor/nxp-opensource/imx/image_process",
+-        "vendor/nxp/fsl-proprietary/include",
+         "device/nxp/common/kernel-headers",
+-        "vendor/nxp-opensource/libdrm-imx",
+-        "vendor/nxp-opensource/libdrm-imx/include/drm",
++        "external/libdrm-android",
++        "external/libdrm-android/include/drm",
+         "vendor/nxp-opensource/imx_opencl_converter/ghdr",
+     ],
+     header_libs: [
+
+diff --git a/libedid/Android.bp b/libedid/Android.bp
+--- a/libedid/Android.bp
++++ b/libedid/Android.bp
+@@ -16,8 +16,8 @@
+     name: "libedid_default",
+     srcs: ["Edid.cpp"],
+     include_dirs: [
+-        "vendor/nxp-opensource/libdrm-imx",
+-        "vendor/nxp-opensource/libdrm-imx/include/drm",
++        "external/libdrm-android",
++        "external/libdrm-android/include/drm",
+         "system/core/include/",
+     ],
+     shared_libs: [
+
+diff --git a/image_process/Android.bp b/image_process/Android.bp
+--- a/image_process/Android.bp
++++ b/image_process/Android.bp
+@@ -72,12 +72,11 @@
+         "frameworks/native/libs/arect/include",
+         "hardware/libhardware/include",
+         "system/core/libsystem/include/system",
+-        "vendor/nxp/fsl-proprietary/include",
+         "vendor/nxp-opensource/imx/include",
+         "vendor/nxp-opensource/imx/display/gralloc",
+         "vendor/nxp-opensource/imx/opencl-2d",
+-        "vendor/nxp-opensource/libdrm-imx",
+-        "vendor/nxp-opensource/libdrm-imx/include/drm",
++        "external/libdrm-android",
++        "external/libdrm-android/include/drm",
+         "vendor/nxp-opensource/imx_opencl_converter/ghdr",
+         "device/nxp/common/kernel-headers",
+     ],
+@@ -109,7 +108,6 @@
+         "hardware/libhardware/include",
+         "device/nxp/common/kernel-headers",
+         "system/core/libsystem/include/system",
+-        "vendor/nxp/fsl-proprietary/include",
+         "vendor/nxp-opensource/imx_opencl_converter/ghdr",
+         "vendor/nxp-opensource/imx/include",
+         "vendor/nxp-opensource/imx/opencl-2d",
+@@ -141,7 +139,6 @@
+         "hardware/libhardware/include",
+         "device/nxp/common/kernel-headers",
+         "system/core/libsystem/include/system",
+-        "vendor/nxp/fsl-proprietary/include",
+         "vendor/nxp-opensource/imx_opencl_converter/ghdr",
+         "vendor/nxp-opensource/imx/include",
+         "vendor/nxp-opensource/imx/opencl-2d",
+
+diff --git a/display/display/Android.bp b/display/display/Android.bp
+--- a/display/display/Android.bp
++++ b/display/display/Android.bp
+@@ -58,11 +58,10 @@
+         "android/uevent.cpp",
+     ],
+     include_dirs: [
+-        "vendor/nxp/fsl-proprietary/include",
+         "vendor/nxp-opensource/imx/include",
+         "vendor/nxp-opensource/imx/libedid",
+-        "vendor/nxp-opensource/libdrm-imx",
+-        "vendor/nxp-opensource/libdrm-imx/include/drm",
++        "external/libdrm-android",
++        "external/libdrm-android/include/drm",
+         "system/memory/libion",
+         "frameworks/native/include",
+         "frameworks/native/libs/ui/",
+
+diff --git a/display/gralloc/Android.bp b/display/gralloc/Android.bp
+--- a/display/gralloc/Android.bp
++++ b/display/gralloc/Android.bp
+@@ -110,11 +110,10 @@
+         "vendor/nxp-opensource/imx/display/gralloc",
+         "vendor/nxp-opensource/imx/display/gralloc/mapper_stablec",
+         "vendor/nxp-opensource/imx/include",
+-        "vendor/nxp/fsl-proprietary/include",
+         "system/core/include",
+         "system/memory/libdmabufheap/include",
+-        "vendor/nxp-opensource/libdrm-imx",
+-        "vendor/nxp-opensource/libdrm-imx/include/drm",
++        "external/libdrm-android",
++        "external/libdrm-android/include/drm",
+         "frameworks/native/include",
+         "frameworks/native/libs/ui/",
+         "frameworks/native/libs/ui/include",
+
+diff --git a/libextcam/Android.bp b/libextcam/Android.bp
+--- a/libextcam/Android.bp
++++ b/libextcam/Android.bp
+@@ -101,11 +101,10 @@
+         "vendor/nxp-opensource/imx/include",
+         "vendor/nxp-opensource/imx/opencl-2d",
+         "vendor/nxp-opensource/imx/image_process",
+-        "vendor/nxp-opensource/libdrm-imx",
+-        "vendor/nxp-opensource/libdrm-imx/include/drm",
++        "external/libdrm-android",
++        "external/libdrm-android/include/drm",
+         "vendor/nxp-opensource/imx_opencl_converter/ghdr",
+         "vendor/nxp-opensource/imx_android_mm/extractor",
+-        "vendor/nxp/fsl-proprietary/include",
+         "device/nxp/common/kernel-headers",
+         "system/core/include/system",
+         "frameworks/av/media/codec2/vndk/include",
+-- 
+2.43.0
