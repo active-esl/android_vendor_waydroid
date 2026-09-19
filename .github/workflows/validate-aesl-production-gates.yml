@@ -41,4 +41,5 @@ jobs:
           grep -Fq 'GraphicBufferMapper::get()' .ci-source/hardware/waydroid/hwcomposer/gralloc_handler.cpp
           grep -Fq 'getPixelFormatFourCC' .ci-source/hardware/waydroid/hwcomposer/gralloc_handler.cpp
           grep -Fq 'getPixelFormatModifier' .ci-source/hardware/waydroid/hwcomposer/gralloc_handler.cpp
+          grep -Fxq 'external/ffmpeg/Android.mk' build/androidmk/allowlist.txt
           bash -n waydroid-patches/apply-patches.sh
