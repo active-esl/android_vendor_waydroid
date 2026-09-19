@@ -14,8 +14,11 @@
 # FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
 # more details.
 
-top_dir=`pwd`
 LOCALDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+top_dir=$(repo root 2>/dev/null) || {
+  echo "Waydroid patches must be applied from an Android repo checkout" >&2
+  exit 1
+}
 patch_dir="$LOCALDIR/base-patches"
 roms_patch_dir="$LOCALDIR/roms-patches"
 
@@ -142,23 +145,10 @@ patch_dir="${patch_dir}-${sdkv}"
 roms_patch_dir="${roms_patch_dir}-${sdkv}"
 
 requirements_file="${patch_dir}/required-revisions.tsv"
-if [[ -f "${requirements_file}" ]]; then
-  while IFS=$'\t' read -r required_project required_revision; do
-    [[ -n "${required_project}" && "${required_project}" != \#* ]] || continue
-    if [[ -z "${required_revision}" ]]; then
-      echo "Invalid required revision entry for ${required_project}" >&2
-      exit 1
-    fi
-    actual_revision=$(git -C "${top_dir}/${required_project}" rev-parse HEAD) || {
-      echo "Required patch dependency is not checked out: ${required_project}" >&2
-      exit 1
-    }
-    if [[ "${actual_revision}" != "${required_revision}" ]]; then
-      echo "Required patch dependency revision mismatch: ${required_project} is ${actual_revision}, expected ${required_revision}" >&2
-      exit 1
-    fi
-  done < "${requirements_file}"
-fi
+python3 "${LOCALDIR}/../scripts/check-waydroid-patch-dependencies.py" \
+  --manifest "${LOCALDIR}/../manifest_scripts/manifests-36/02-waydroid.xml" \
+  --requirements "${requirements_file}" \
+  --source-root "${top_dir}"
 
 #Apply common patches
 cd $patch_dir
