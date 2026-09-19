@@ -20,6 +20,20 @@ jobs:
           ref: b92200ac592ed43acd9f1f1bc41c09bc407b1732
           path: .ci-source/hardware/waydroid
           persist-credentials: false
+      - name: Check out pinned Android 16 Soong
+        uses: actions/checkout@v4
+        with:
+          repository: LineageOS/android_build_soong
+          ref: 9aa045a2aef10b8089e32e847fed26d9aa3d61be
+          path: .ci-source/build/soong
+          persist-credentials: false
+      - name: Check out pinned Waydroid FFmpeg
+        uses: actions/checkout@v4
+        with:
+          repository: waydroid/android_external_ffmpeg
+          ref: c5b53ceda3390c614bc10095d31f7be6b29337eb
+          path: .ci-source/external/ffmpeg
+          persist-credentials: false
       - name: Require SELinux neverallow enforcement
         run: |
           if grep -R --line-number --fixed-strings --exclude-dir=.git \
@@ -42,4 +56,6 @@ jobs:
           grep -Fq 'getPixelFormatFourCC' .ci-source/hardware/waydroid/hwcomposer/gralloc_handler.cpp
           grep -Fq 'getPixelFormatModifier' .ci-source/hardware/waydroid/hwcomposer/gralloc_handler.cpp
           grep -Fxq 'external/ffmpeg/Android.mk' build/androidmk/allowlist.txt
+          grep -Fq 'vendor/extra/build/androidmk/allowlist.txt' .ci-source/build/soong/ui/build/androidmk_denylist.go
+          test -f .ci-source/external/ffmpeg/Android.mk
           bash -n waydroid-patches/apply-patches.sh
