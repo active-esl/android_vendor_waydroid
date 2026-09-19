@@ -34,6 +34,17 @@ jobs:
           ref: c5b53ceda3390c614bc10095d31f7be6b29337eb
           path: .ci-source/external/ffmpeg
           persist-credentials: false
+      - name: Check out production patch tooling and lock
+        uses: actions/checkout@v4
+        with:
+          repository: active-esl/waydroid-product-manifest
+          ref: 6afd53a666f3ab42fabb88d7f8b9a6a982084819
+          path: .ci-tools/product-manifest
+          persist-credentials: false
+      - name: Assemble Android production source paths
+        run: |
+          mkdir -p .ci-source/.repo .ci-source/vendor
+          ln -s "$GITHUB_WORKSPACE" .ci-source/vendor/extra
       - name: Require SELinux neverallow enforcement
         run: |
           if grep -R --line-number --fixed-strings --exclude-dir=.git \
@@ -55,9 +66,17 @@ jobs:
           grep -Fq 'GraphicBufferMapper::get()' .ci-source/hardware/waydroid/hwcomposer/gralloc_handler.cpp
           grep -Fq 'getPixelFormatFourCC' .ci-source/hardware/waydroid/hwcomposer/gralloc_handler.cpp
           grep -Fq 'getPixelFormatModifier' .ci-source/hardware/waydroid/hwcomposer/gralloc_handler.cpp
-          git -C .ci-source/build/soong apply --check "$GITHUB_WORKSPACE/waydroid-patches/base-patches-36/build/soong/0006-Allow-Waydroid-FFmpeg-Android.mk-files.patch"
-          git -C .ci-source/build/soong apply "$GITHUB_WORKSPACE/waydroid-patches/base-patches-36/build/soong/0006-Allow-Waydroid-FFmpeg-Android.mk-files.patch"
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          projects = {
+              project.get("path"): project.get("revision")
+              for project in ET.parse(".ci-tools/product-manifest/locks/lineage-23.2-lock.xml").getroot().findall("project")
+          }
+          assert projects["build/soong"] == "9aa045a2aef10b8089e32e847fed26d9aa3d61be"
+          assert projects["external/ffmpeg"] == "c5b53ceda3390c614bc10095d31f7be6b29337eb"
+          PY
+          .ci-tools/product-manifest/scripts/apply-waydroid-patches-strict.sh "$GITHUB_WORKSPACE/.ci-source" build/soong
           find .ci-source/external/ffmpeg -name Android.mk -printf 'external/ffmpeg/%P\n' | sort > /tmp/ffmpeg-androidmks
-          grep -o '"external/ffmpeg[^"]*Android.mk"' .ci-source/build/soong/ui/build/androidmk_denylist.go | tr -d '"' | sort > /tmp/soong-ffmpeg-allowlist
+          sed -n '/^var androidmk_allowlist/,/^}/p' .ci-source/build/soong/ui/build/androidmk_denylist.go | grep -o '"external/ffmpeg[^"]*Android.mk"' | tr -d '"' | sort > /tmp/soong-ffmpeg-allowlist
           diff -u /tmp/ffmpeg-androidmks /tmp/soong-ffmpeg-allowlist
           bash -n waydroid-patches/apply-patches.sh
