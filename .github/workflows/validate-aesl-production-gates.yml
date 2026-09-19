@@ -25,3 +25,8 @@ jobs:
         run: |
           python3 scripts/check-selinux-runtime-gate.py
           grep -Fq 'selinux-runtime-exception.json:$(TARGET_COPY_OUT_VENDOR)/etc/aesl/selinux-runtime-exception.json' product.mk
+      - name: Require pinned SDK 36 patch dependencies
+        run: |
+          grep -Fq 'hardware/waydroid	b92200ac592ed43acd9f1f1bc41c09bc407b1732' waydroid-patches/base-patches-36/required-revisions.tsv
+          grep -Fq 'path="hardware/waydroid" name="active-esl/android_hardware_waydroid" remote="ghub" clone-depth="1" revision="b92200ac592ed43acd9f1f1bc41c09bc407b1732"' manifest_scripts/manifests-36/02-waydroid.xml
+          bash -n waydroid-patches/apply-patches.sh
