@@ -34,6 +34,11 @@ jobs:
           ref: c5b53ceda3390c614bc10095d31f7be6b29337eb
           path: .ci-source/external/ffmpeg
           persist-credentials: false
+      - name: Assemble Android production source paths
+        run: |
+          mkdir -p .ci-source/vendor
+          ln -s "$GITHUB_WORKSPACE" .ci-source/vendor/extra
+          test -f .ci-source/vendor/extra/build/androidmk/allowlist.txt
       - name: Require SELinux neverallow enforcement
         run: |
           if grep -R --line-number --fixed-strings --exclude-dir=.git \
@@ -55,7 +60,7 @@ jobs:
           grep -Fq 'GraphicBufferMapper::get()' .ci-source/hardware/waydroid/hwcomposer/gralloc_handler.cpp
           grep -Fq 'getPixelFormatFourCC' .ci-source/hardware/waydroid/hwcomposer/gralloc_handler.cpp
           grep -Fq 'getPixelFormatModifier' .ci-source/hardware/waydroid/hwcomposer/gralloc_handler.cpp
-          grep -Fxq 'external/ffmpeg/Android.mk' build/androidmk/allowlist.txt
+          grep -Fxq 'external/ffmpeg/Android.mk' .ci-source/vendor/extra/build/androidmk/allowlist.txt
           grep -Fq 'vendor/extra/build/androidmk/allowlist.txt' .ci-source/build/soong/ui/build/androidmk_denylist.go
           test -f .ci-source/external/ffmpeg/Android.mk
           bash -n waydroid-patches/apply-patches.sh
