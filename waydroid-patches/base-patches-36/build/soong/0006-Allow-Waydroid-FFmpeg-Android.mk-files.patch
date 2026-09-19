@@ -1,0 +1,30 @@
+From 5a4e208caf97eaeddda322ee85b39fccbc4f4fb8 Mon Sep 17 00:00:00 2001
+From: Active ESL Engineering <engineering@active-esl.com>
+Date: Sun, 20 Sep 2026 00:12:56 +0100
+Subject: [PATCH] build: allow Waydroid FFmpeg Android.mk files
+
+---
+ ui/build/androidmk_denylist.go | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/ui/build/androidmk_denylist.go b/ui/build/androidmk_denylist.go
+index ea4c65c9d..481d25902 100644
+--- a/ui/build/androidmk_denylist.go
++++ b/ui/build/androidmk_denylist.go
+@@ -62,6 +62,13 @@ var androidmk_denylist []string = []string{
+ var androidmk_allowlist []string = []string{
+ 	"bootable/deprecated-ota/updater/Android.mk",
+ 	"external/mesa/android/Android.mk",
++	"external/ffmpeg/Android.mk",
++	"external/ffmpeg/libavcodec/Android.mk",
++	"external/ffmpeg/libavfilter/Android.mk",
++	"external/ffmpeg/libavformat/Android.mk",
++	"external/ffmpeg/libavutil/Android.mk",
++	"external/ffmpeg/libswresample/Android.mk",
++	"external/ffmpeg/libswscale/Android.mk",
+ }
+ 
+ func getAllLines(ctx Context, filename string) []string {
+-- 
+2.43.0
+
